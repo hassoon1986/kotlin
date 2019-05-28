@@ -26,12 +26,16 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.MetadataPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.builtins.BuiltInSerializerProtocol
+import org.jetbrains.kotlin.utils.getOrPutNullable
 import java.io.InputStream
 
 class CliVirtualFileFinder(
     private val index: JvmDependenciesIndex,
     private val scope: GlobalSearchScope
 ) : VirtualFileFinder() {
+
+    val classIdCache = mutableMapOf<ClassId, VirtualFile?>()
+
     override fun findVirtualFileWithHeader(classId: ClassId): VirtualFile? =
         findBinaryClass(classId, classId.relativeClassName.asString().replace('.', '$') + ".class")
 
@@ -62,7 +66,9 @@ class CliVirtualFileFinder(
     }
 
     private fun findBinaryClass(classId: ClassId, fileName: String): VirtualFile? =
-        index.findClass(classId, acceptedRootTypes = JavaRoot.OnlyBinary) { dir, _ ->
-            dir.findChild(fileName)?.takeIf(VirtualFile::isValid)
-        }?.takeIf { it in scope }
+        classIdCache.getOrPutNullable(classId) {
+            index.findClass(classId, acceptedRootTypes = JavaRoot.OnlyBinary) { dir, _ ->
+                dir.findChild(fileName)?.takeIf(VirtualFile::isValid)
+            }?.takeIf { it in scope }
+        }
 }
