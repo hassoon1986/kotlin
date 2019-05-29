@@ -469,14 +469,6 @@ object AbstractNullabilityChecker {
         }
 
     private fun AbstractTypeCheckerContext.runIsPossibleSubtype(subType: SimpleTypeMarker, superType: SimpleTypeMarker): Boolean {
-        // it makes for case String? & Any <: String
-        assert(subType.isSingleClassifierType() || subType.typeConstructor().isIntersection() || subType.isAllowedTypeVariable) {
-            "Not singleClassifierType and not intersection subType: $subType"
-        }
-        assert(superType.isSingleClassifierType() || superType.isAllowedTypeVariable) {
-            "Not singleClassifierType superType: $superType"
-        }
-
         // superType is actually nullable
         if (superType.isMarkedNullable()) return true
 
