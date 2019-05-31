@@ -27,6 +27,8 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.types.impl.ConeAbbreviatedTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeClassTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
 import org.jetbrains.kotlin.types.checker.convertVariance
 import org.jetbrains.kotlin.types.model.*
@@ -338,13 +340,12 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
     }
 
     override fun TypeConstructorMarker.isAnyConstructor(): Boolean {
-        return this is ConeClassLikeSymbol && classId.asString() == "kotlin/Any"
+        return this is ConeClassLikeSymbol && classId == ANY_CLASS_ID
     }
 
     override fun TypeConstructorMarker.isNothingConstructor(): Boolean {
-        return this is ConeClassLikeSymbol && classId.asString() == "kotlin/Nothing"
+        return this is ConeClassLikeSymbol && classId == NOTHING_CLASS_ID
     }
-
 
     override fun KotlinTypeMarker.isNotNullNothing(): Boolean {
         require(this is ConeKotlinType)
@@ -389,6 +390,9 @@ interface ConeTypeContext : TypeSystemContext, TypeSystemOptimizationContext {
         }
     }
 }
+
+private val ANY_CLASS_ID = ClassId.topLevel(FqName("kotlin.Any"))
+private val NOTHING_CLASS_ID = ClassId.topLevel(FqName("kotlin.Nothing"))
 
 class ConeTypeCheckerContext(override val isErrorTypeEqualsToAnything: Boolean, override val session: FirSession) :
     AbstractTypeCheckerContext(), ConeTypeContext {
