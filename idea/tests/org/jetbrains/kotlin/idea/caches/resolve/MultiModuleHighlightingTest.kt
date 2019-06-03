@@ -13,7 +13,6 @@ import com.intellij.openapi.roots.DependencyScope
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.PsiModificationTrackerImpl
 import com.intellij.psi.util.PsiModificationTracker
 import org.jetbrains.kotlin.analyzer.ModuleInfo
@@ -25,14 +24,14 @@ import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.idea.caches.project.ModuleSourceInfo
 import org.jetbrains.kotlin.idea.caches.project.SdkInfo
+import org.jetbrains.kotlin.idea.caches.trackers.KotlinCodeBlockModificationListener
+import org.jetbrains.kotlin.idea.caches.trackers.KotlinModuleOutOfCodeBlockModificationTracker
 import org.jetbrains.kotlin.idea.compiler.configuration.KotlinCommonCompilerArgumentsHolder
 import org.jetbrains.kotlin.idea.compiler.configuration.KotlinCompilerSettings
 import org.jetbrains.kotlin.idea.completion.test.withServiceRegistered
 import org.jetbrains.kotlin.idea.facet.KotlinFacetConfiguration
 import org.jetbrains.kotlin.idea.facet.KotlinFacetType
 import org.jetbrains.kotlin.idea.framework.JSLibraryKind
-import org.jetbrains.kotlin.idea.caches.trackers.KotlinCodeBlockModificationListener
-import org.jetbrains.kotlin.idea.caches.trackers.KotlinModuleModificationTracker
 import org.jetbrains.kotlin.idea.test.PluginTestCaseBase
 import org.jetbrains.kotlin.idea.test.allKotlinFiles
 import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
@@ -134,11 +133,12 @@ open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
             tracker.sdkResolversComputed.clear()
             tracker.moduleResolversComputed.clear()
 
-            val module1ModCount = KotlinCodeBlockModificationListener.getInstance(myProject).getModificationCount(module1)
+            KotlinModuleOutOfCodeBlockModificationTracker.initialize(project)
+            val module1ModCount = KotlinModuleOutOfCodeBlockModificationTracker.getModificationCount(module1)
 
-            val module1ModTracker = KotlinModuleModificationTracker(module1)
-            val module2ModTracker = KotlinModuleModificationTracker(module2)
-            val module3ModTracker = KotlinModuleModificationTracker(module3)
+            val module1ModTracker = KotlinModuleOutOfCodeBlockModificationTracker(module1)
+            val module2ModTracker = KotlinModuleOutOfCodeBlockModificationTracker(module2)
+            val module3ModTracker = KotlinModuleOutOfCodeBlockModificationTracker(module3)
 
             val contentRoot = ModuleRootManager.getInstance(module2).contentRoots.single()
             val m2 = contentRoot.findChild("m2.kt")!!
@@ -147,9 +147,10 @@ open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
                 m2doc.insertString(m2doc.textLength , "fun foo() = 1")
                 PsiDocumentManager.getInstance(myProject).commitAllDocuments()
             }
-            val currentModCount = PsiManager.getInstance(project).modificationTracker.outOfCodeBlockModificationCount
 
-            assertEquals(module1ModCount, KotlinCodeBlockModificationListener.getInstance(myProject).getModificationCount(module1))
+            val currentModCount = KotlinCodeBlockModificationListener.getInstance(project).kotlinOutOfCodeBlockTracker.modificationCount
+
+            assertEquals(module1ModCount, KotlinModuleOutOfCodeBlockModificationTracker.getModificationCount(module1))
             assertEquals(module1ModCount, module1ModTracker.modificationCount)
             assertEquals(currentModCount, module2ModTracker.modificationCount)
             assertEquals(currentModCount, module3ModTracker.modificationCount)
