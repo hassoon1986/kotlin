@@ -5,10 +5,14 @@
 
 package org.jetbrains.kotlin.fir
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirThisReference : FirReference {
-    val labelName: String?
+abstract class FirThisReference(
+    session: FirSession,
+    psi: PsiElement?
+) : FirReference(session, psi) {
+    abstract val labelName: String?
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitThisReference(this, data)

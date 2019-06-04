@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.BaseTransformedType
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
@@ -13,17 +14,20 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.FqName
 
 @BaseTransformedType
-interface FirFile : @VisitedSupertype FirPackageFragment, FirDeclaration, FirAnnotationContainer {
+abstract class FirFile(
+    session: FirSession,
+    psi: PsiElement?
+) : @VisitedSupertype FirPackageFragment(session, psi), FirAnnotationContainer {
 
     @Suppress("DEPRECATION")
     val fileSession: FirSession
         get() = session
 
-    val name: String
+    abstract val name: String
 
-    val packageFqName: FqName
+    abstract val packageFqName: FqName
 
-    val imports: List<FirImport>
+    abstract val imports: List<FirImport>
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitFile(this, data)
@@ -33,6 +37,6 @@ interface FirFile : @VisitedSupertype FirPackageFragment, FirDeclaration, FirAnn
         for (import in imports) {
             import.accept(visitor, data)
         }
-        super<FirPackageFragment>.acceptChildren(visitor, data)
+        super.acceptChildren(visitor, data)
     }
 }

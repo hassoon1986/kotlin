@@ -29,13 +29,11 @@ import org.jetbrains.kotlin.fir.service
 import org.jetbrains.kotlin.fir.symbols.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.inference.model.ConstraintStorage
-import org.jetbrains.kotlin.resolve.calls.inference.model.SimpleConstraintSystemConstraintPosition
 import org.jetbrains.kotlin.resolve.calls.model.PostponedResolvedAtomMarker
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.types.AbstractTypeChecker
@@ -170,7 +168,7 @@ interface TowerScopeLevel {
 abstract class SessionBasedTowerLevel(val session: FirSession) : TowerScopeLevel {
     protected fun ConeSymbol.dispatchReceiverValue(): ClassDispatchReceiverValue? {
         return when (this) {
-            is FirFunctionSymbol -> fir.dispatchReceiverValue(session)
+            is FirNamedFunctionSymbol -> fir.dispatchReceiverValue(session)
             is FirClassSymbol -> ClassDispatchReceiverValue(fir.symbol)
             else -> null
         }
@@ -242,7 +240,11 @@ class MemberScopeTowerLevel(
 
 }
 
-private fun ConeCallableSymbol.hasExtensionReceiver(): Boolean = (this as? FirCallableSymbol)?.fir?.receiverTypeRef != null
+private fun ConeCallableSymbol.extensionReceiverTypeRef(): FirTypeRef? =
+    ((this as? FirCallableSymbol<*>)?.fir as? FirCallableDeclaration<*>)?.receiverTypeRef
+
+private fun ConeCallableSymbol.hasExtensionReceiver(): Boolean =
+    extensionReceiverTypeRef() != null
 
 // This is more like "scope-based tower level"
 // We can access here members of currently accessible scope which is not influenced by explicit receiver
@@ -326,7 +328,7 @@ class QualifiedReceiverTowerLevel(session: FirSession) : SessionBasedTowerLevel(
             }
         } else {
             scope.processCallables(name, token.cast()) {
-                val fir = it.firUnsafe<FirCallableMemberDeclaration>()
+                val fir = it.firUnsafe<FirCallableMemberDeclaration<*>>()
                 if (fir.isStatic || it.callableId.classId == null) {
                     processor.consumeCandidate(it as T, null, null)
                 } else {
@@ -552,11 +554,11 @@ class ExplicitReceiverTowerDataConsumer<T : ConeSymbol>(
                             dispatchReceiverValue: ClassDispatchReceiverValue?,
                             implicitExtensionReceiverValue: ImplicitReceiverValue?
                         ): ProcessorAction {
-                            if (symbol is FirFunctionSymbol && symbol.callableId.packageName.startsWith(defaultPackage)) {
+                            if (symbol is FirNamedFunctionSymbol && symbol.callableId.packageName.startsWith(defaultPackage)) {
                                 val explicitReceiverType = explicitReceiver.type
                                 if (dispatchReceiverValue == null && explicitReceiverType is ConeClassType) {
                                     val declarationReceiverTypeRef =
-                                        (symbol as? FirCallableSymbol)?.fir?.receiverTypeRef as? FirResolvedTypeRef
+                                        symbol.extensionReceiverTypeRef() as? FirResolvedTypeRef
                                     val declarationReceiverType = declarationReceiverTypeRef?.type
                                     if (declarationReceiverType is ConeClassType) {
                                         if (!AbstractTypeChecker.isSubtypeOf(
@@ -808,10 +810,10 @@ class CandidateCollector(val callInfo: CallInfo, val components: InferenceCompon
     }
 }
 
-fun FirCallableDeclaration.dispatchReceiverValue(session: FirSession): ClassDispatchReceiverValue? {
+fun FirCallableDeclaration<*>.dispatchReceiverValue(session: FirSession): ClassDispatchReceiverValue? {
     // TODO: this is not true at least for inner class constructors
     if (this is FirConstructor) return null
-    val id = (this.symbol as ConeCallableSymbol).callableId.classId ?: return null
+    val id = this.symbol.callableId.classId ?: return null
     val symbol = session.service<FirSymbolProvider>().getClassLikeSymbolByFqName(id) as? FirClassSymbol ?: return null
     val regularClass = symbol.fir
 

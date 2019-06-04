@@ -6,10 +6,9 @@
 package org.jetbrains.kotlin.fir.scopes.impl
 
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirCallableMemberDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirConstructor
-import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
-import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirMemberFunctionImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirValueParameterImpl
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
@@ -17,10 +16,18 @@ import org.jetbrains.kotlin.fir.resolve.transformers.ReturnTypeCalculatorWithJum
 import org.jetbrains.kotlin.fir.resolve.transformers.firUnsafe
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
-import org.jetbrains.kotlin.fir.symbols.*
+import org.jetbrains.kotlin.fir.symbols.ConeCallableSymbol
+import org.jetbrains.kotlin.fir.symbols.ConeFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.ConeVariableSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
-import org.jetbrains.kotlin.fir.types.*
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.fir.types.coneTypeUnsafe
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
 import org.jetbrains.kotlin.name.Name
 
@@ -55,10 +62,10 @@ class FirClassSubstitutionScope(
         return substitutor.substituteOrNull(this)
     }
 
-    private fun createFakeOverride(original: ConeFunctionSymbol): FirFunctionSymbol {
+    private fun createFakeOverride(original: ConeFunctionSymbol): FirFunctionSymbol<*> {
 
-        val member = original.firUnsafe<FirFunction>()
-        if (member is FirConstructor) return original as FirFunctionSymbol // TODO: substitution for constructors
+        val member = original.firUnsafe<FirCallableMemberDeclaration<*>>()
+        if (member is FirConstructor) return original as FirConstructorSymbol // TODO: substitution for constructors
         member as FirNamedFunction
 
         val receiverType = member.receiverTypeRef?.coneTypeUnsafe<ConeKotlinType>()
@@ -71,19 +78,19 @@ class FirClassSubstitutionScope(
             it.returnTypeRef.coneTypeUnsafe<ConeKotlinType>().substitute()
         }
 
-        return createFakeOverride(session, member, original as FirFunctionSymbol, newReceiverType, newReturnType, newParameterTypes)
+        return createFakeOverride(session, member, original as FirNamedFunctionSymbol, newReceiverType, newReturnType, newParameterTypes)
     }
 
     companion object {
         fun createFakeOverride(
             session: FirSession,
             baseFunction: FirNamedFunction,
-            baseSymbol: FirFunctionSymbol,
+            baseSymbol: FirNamedFunctionSymbol,
             newReceiverType: ConeKotlinType? = null,
             newReturnType: ConeKotlinType? = null,
             newParameterTypes: List<ConeKotlinType?>? = null
-        ): FirFunctionSymbol {
-            val symbol = FirFunctionSymbol(baseSymbol.callableId, true, baseSymbol)
+        ): FirNamedFunctionSymbol {
+            val symbol = FirNamedFunctionSymbol(baseSymbol.callableId, true, baseSymbol)
             with(baseFunction) {
                 // TODO: consider using here some light-weight functions instead of pseudo-real FirMemberFunctionImpl
                 // As second alternative, we can invent some light-weight kind of FirRegularClass
@@ -93,7 +100,7 @@ class FirClassSubstitutionScope(
                     baseFunction.receiverTypeRef?.withReplacedConeType(session, newReceiverType),
                     baseFunction.returnTypeRef.withReplacedConeType(session, newReturnType)
                 ).apply {
-                    status = baseFunction.status as FirDeclarationStatusImpl
+                    status = baseFunction.status
                     valueParameters += baseFunction.valueParameters.zip(
                         newParameterTypes ?: List(baseFunction.valueParameters.size) { null }
                     ) { valueParameter, newType ->

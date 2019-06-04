@@ -5,11 +5,16 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
 // Is it necessary?
-interface FirErrorDeclaration : FirDeclaration {
-    val reason: String
+abstract class FirErrorDeclaration(
+    session: FirSession,
+    psi: PsiElement?
+) : FirDeclaration(session, psi) {
+    abstract val reason: String
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitErrorDeclaration(this, data)

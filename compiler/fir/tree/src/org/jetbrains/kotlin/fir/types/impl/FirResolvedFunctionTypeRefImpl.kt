@@ -18,15 +18,14 @@ import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 
 class FirResolvedFunctionTypeRefImpl(
-    override val psi: PsiElement?,
-    override val session: FirSession,
-    override val isMarkedNullable: Boolean,
-    override val annotations: MutableList<FirAnnotationCall>,
+    psi: PsiElement?,
+    session: FirSession,
+    override val annotations: List<FirAnnotationCall>,
     override var receiverTypeRef: FirTypeRef?,
     override val valueParameters: MutableList<FirValueParameter>,
     override var returnTypeRef: FirTypeRef,
     override val type: ConeKotlinType
-) : FirResolvedFunctionTypeRef {
+) : FirResolvedFunctionTypeRef(session, psi) {
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         receiverTypeRef = receiverTypeRef?.transformSingle(transformer, data)

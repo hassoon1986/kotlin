@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.declarations.impl
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
@@ -14,47 +13,36 @@ import org.jetbrains.kotlin.fir.declarations.FirConstructor
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirDelegatedConstructorCall
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.transformInplace
 import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.name.Name
 
-open class FirConstructorImpl : FirAbstractCallableMember, FirConstructor {
-
-    override val symbol: FirFunctionSymbol
-
-    final override var delegatedConstructor: FirDelegatedConstructorCall? = null
+open class FirConstructorImpl : FirConstructor {
 
     constructor(
         session: FirSession,
         psi: PsiElement?,
-        symbol: FirFunctionSymbol,
+        symbol: FirConstructorSymbol,
         visibility: Visibility,
         isExpect: Boolean,
         isActual: Boolean,
         delegatedSelfTypeRef: FirTypeRef,
         delegatedConstructor: FirDelegatedConstructorCall?
     ) : super(
-        session, psi, NAME, visibility, Modality.FINAL,
-        isExpect, isActual, isOverride = false, receiverTypeRef = null, returnTypeRef = delegatedSelfTypeRef
-    ) {
-        this.symbol = symbol
-        this.delegatedConstructor = delegatedConstructor
-        symbol.bind(this)
-    }
+        session, psi, symbol, visibility,
+        isExpect, isActual, delegatedSelfTypeRef, delegatedConstructor
+    )
 
     constructor(
         session: FirSession,
         psi: PsiElement?,
-        symbol: FirFunctionSymbol,
+        symbol: FirConstructorSymbol,
         receiverTypeRef: FirTypeRef?,
         returnTypeRef: FirTypeRef
-    ) : super(session, psi, NAME, receiverTypeRef, returnTypeRef) {
-        this.symbol = symbol
-        symbol.bind(this)
-    }
+    ) : super(session, psi, symbol, receiverTypeRef, returnTypeRef)
 
     override val valueParameters = mutableListOf<FirValueParameter>()
 
@@ -69,9 +57,5 @@ open class FirConstructorImpl : FirAbstractCallableMember, FirConstructor {
         body = body?.transformSingle(transformer, data)
 
         return this
-    }
-
-    companion object {
-        val NAME = Name.special("<init>")
     }
 }

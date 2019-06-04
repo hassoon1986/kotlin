@@ -9,12 +9,11 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.*
+import org.jetbrains.kotlin.fir.declarations.FirDeclarationStatus
 import org.jetbrains.kotlin.fir.declarations.FirPropertyAccessor
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
-import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.symbols.CallableId
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.fir.transformInplace
 import org.jetbrains.kotlin.fir.transformSingle
@@ -29,16 +28,13 @@ abstract class FirDefaultPropertyAccessor(
     psi: PsiElement?,
     final override val isGetter: Boolean,
     visibility: Visibility
-) : FirAbstractElement(session, psi), FirPropertyAccessor {
-    override var status = FirDeclarationStatusImpl(
+) : FirPropertyAccessor(session, psi) {
+    override var status: FirDeclarationStatus = FirDeclarationStatusImpl(
         session, visibility, Modality.FINAL
     )
 
     final override val body: FirBlock? =
         null
-
-    final override val annotations: List<FirAnnotationCall>
-        get() = emptyList()
 
     abstract override var returnTypeRef: FirTypeRef
 

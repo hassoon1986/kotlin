@@ -13,7 +13,9 @@ import org.jetbrains.kotlin.fir.transformInplace
 import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.FirFunctionTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.fir.types.FirTypeRefWithNullability
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
+import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
 class FirFunctionTypeRefImpl(
     session: FirSession,
@@ -21,14 +23,23 @@ class FirFunctionTypeRefImpl(
     isNullable: Boolean,
     override var receiverTypeRef: FirTypeRef?,
     override var returnTypeRef: FirTypeRef
-) : FirAbstractAnnotatedTypeRef(session, psi, isNullable), FirFunctionTypeRef {
+) : FirTypeRefWithNullability(session, psi, isNullable), FirFunctionTypeRef {
     override val valueParameters = mutableListOf<FirValueParameter>()
+
+    override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
+        receiverTypeRef?.accept(visitor, data)
+        returnTypeRef.accept(visitor, data)
+        for (parameter in valueParameters) {
+            parameter.accept(visitor, data)
+        }
+        super.acceptChildren(visitor, data)
+    }
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         receiverTypeRef = receiverTypeRef?.transformSingle(transformer, data)
         returnTypeRef = returnTypeRef.transformSingle(transformer, data)
         valueParameters.transformInplace(transformer, data)
 
-        return super<FirAbstractAnnotatedTypeRef>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

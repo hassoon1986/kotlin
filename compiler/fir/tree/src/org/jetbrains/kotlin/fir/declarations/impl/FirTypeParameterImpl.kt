@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.declarations.impl
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirNamedDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirTypeParameter
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
 import org.jetbrains.kotlin.fir.transformInplace
@@ -23,7 +24,7 @@ class FirTypeParameterImpl(
     name: Name,
     override val variance: Variance,
     override val isReified: Boolean
-) : FirAbstractNamedAnnotatedDeclaration(session, psi, name), FirTypeParameter {
+) : FirTypeParameter(session, psi, name) {
     init {
         symbol.bind(this)
     }
@@ -33,6 +34,6 @@ class FirTypeParameterImpl(
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         bounds.transformInplace(transformer, data)
 
-        return super<FirAbstractNamedAnnotatedDeclaration>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

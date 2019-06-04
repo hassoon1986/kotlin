@@ -5,11 +5,15 @@
 
 package org.jetbrains.kotlin.fir
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.symbols.ConeSymbol
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirResolvedCallableReference : FirNamedReference {
-    val coneSymbol: ConeSymbol
+abstract class FirResolvedCallableReference(
+    session: FirSession,
+    psi: PsiElement?
+) : FirNamedReference(session, psi) {
+    abstract val coneSymbol: ConeSymbol
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitResolvedCallableReference(this, data)

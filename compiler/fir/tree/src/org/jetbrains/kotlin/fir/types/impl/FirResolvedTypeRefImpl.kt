@@ -12,8 +12,8 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 
 class FirResolvedTypeRefImpl(
-    override val session: FirSession,
-    override val psi: PsiElement?,
+    session: FirSession,
+    psi: PsiElement?,
     override val type: ConeKotlinType,
     override val annotations: List<FirAnnotationCall> = emptyList()
-) : FirResolvedTypeRef
+) : FirResolvedTypeRef(session, psi)

@@ -5,16 +5,10 @@
 
 package org.jetbrains.kotlin.fir.symbols.impl
 
-import org.jetbrains.kotlin.fir.symbols.CallableId
+import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirFunction
+import org.jetbrains.kotlin.fir.declarations.FirNamedDeclaration
 import org.jetbrains.kotlin.fir.symbols.ConeFunctionSymbol
-import org.jetbrains.kotlin.fir.types.ConeKotlinType
 
-class FirFunctionSymbol(
-    override val callableId: CallableId,
-    val isFakeOverride: Boolean = false,
-    // Actual for fake override only
-    val overriddenSymbol: FirFunctionSymbol? = null
-) : ConeFunctionSymbol, FirCallableSymbol() {
-    override val parameters: List<ConeKotlinType>
-        get() = emptyList()
-}
+abstract class FirFunctionSymbol<D> :
+    ConeFunctionSymbol, FirCallableSymbol<D>() where D : FirNamedDeclaration, D : FirCallableDeclaration<D>, D : FirFunction

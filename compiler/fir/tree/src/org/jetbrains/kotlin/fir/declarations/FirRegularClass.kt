@@ -5,17 +5,31 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.BaseTransformedType
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.symbols.FirSymbolOwner
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
 // May be all containers should be properties and not base classes
 // About descriptors: introduce something like FirDescriptor which is FirUnresolved at the beginning and FirSymbol(descriptor) at the end
-@BaseTransformedType
-interface FirRegularClass : FirClass, @VisitedSupertype FirClassLikeDeclaration, FirSymbolOwner<FirRegularClass> {
+abstract class FirRegularClass(
+    session: FirSession,
+    psi: PsiElement?,
+    name: Name,
+    visibility: Visibility,
+    modality: Modality?,
+    isExpect: Boolean,
+    isActual: Boolean
+) : @VisitedSupertype FirClassLikeDeclaration<FirRegularClass>(
+    session, psi, name, visibility, modality, isExpect, isActual
+), FirClass, FirSymbolOwner<FirRegularClass> {
     val isInner: Boolean get() = status.isInner
 
     val isCompanion: Boolean get() = status.isCompanion
@@ -24,9 +38,9 @@ interface FirRegularClass : FirClass, @VisitedSupertype FirClassLikeDeclaration,
 
     val isInline: Boolean get() = status.isInline
 
-    val companionObject: FirRegularClass?
+    abstract val companionObject: FirRegularClass?
 
-    override val symbol: FirClassSymbol
+    abstract override val symbol: FirClassSymbol
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitRegularClass(this, data)
@@ -36,7 +50,7 @@ interface FirRegularClass : FirClass, @VisitedSupertype FirClassLikeDeclaration,
         super<FirClass>.acceptChildren(visitor, data)
     }
 
-    fun replaceSupertypes(newSupertypes: List<FirTypeRef>): FirRegularClass
+    abstract fun replaceSupertypes(newSupertypes: List<FirTypeRef>): FirRegularClass
 }
 
 val FirRegularClass.classId get() = symbol.classId

@@ -6,4 +6,4 @@
 package org.jetbrains.kotlin.fir
 
 // Any target of return / break / continue (some targets may have labels, some never have them)
-interface FirTargetElement : FirElement
+interface FirTargetElement

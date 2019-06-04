@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.fir.expressions.impl
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.*
-import org.jetbrains.kotlin.fir.expressions.FirCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccess
@@ -18,7 +17,7 @@ class FirFunctionCallImpl(
     session: FirSession,
     psi: PsiElement?,
     override var safe: Boolean = false
-) : FirAbstractCall(session, psi), FirFunctionCall, FirModifiableQualifiedAccess {
+) : FirFunctionCall(session, psi), FirModifiableQualifiedAccess<FirNamedReference> {
     override val typeArguments = mutableListOf<FirTypeProjection>()
 
     override lateinit var calleeReference: FirNamedReference
@@ -29,7 +28,7 @@ class FirFunctionCallImpl(
         typeArguments.transformInplace(transformer, data)
         calleeReference = calleeReference.transformSingle(transformer, data)
         explicitReceiver = explicitReceiver?.transformSingle(transformer, data)
-        return super<FirAbstractCall>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 
     override fun <D> transformCalleeReference(transformer: FirTransformer<D>, data: D): FirQualifiedAccess {

@@ -5,13 +5,18 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirDelegatedTypeRef : FirTypeRef {
-    val delegate: FirExpression?
+abstract class FirDelegatedTypeRef(
+    session: FirSession,
+    psi: PsiElement?
+) : FirTypeRef(session, psi) {
+    abstract val delegate: FirExpression?
 
-    val typeRef: FirTypeRef
+    abstract val typeRef: FirTypeRef
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitDelegatedTypeRef(this, data)

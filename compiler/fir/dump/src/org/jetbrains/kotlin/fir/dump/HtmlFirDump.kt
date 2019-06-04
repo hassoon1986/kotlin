@@ -794,7 +794,7 @@ class HtmlFirDump internal constructor(private var linkResolver: FirLinkResolver
         +"> "
     }
 
-    private fun FlowContent.generateReceiver(declaration: FirCallableDeclaration) {
+    private fun FlowContent.generateReceiver(declaration: FirCallableDeclaration<*>) {
         generateReceiver(declaration.receiverTypeRef)
     }
 

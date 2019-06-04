@@ -5,11 +5,28 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.impl.FirMutableAnnotationContainer
+import org.jetbrains.kotlin.fir.transformInplace
+import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirTypeRefWithNullability : FirTypeRef {
+abstract class FirTypeRefWithNullability(
+    session: FirSession,
+    psi: PsiElement?,
     val isMarkedNullable: Boolean
+) : FirTypeRef(session, psi), FirMutableAnnotationContainer {
+    override val annotations = mutableListOf<FirAnnotationCall>()
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitTypeRefWithNullability(this, data)
+
+    override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
+        annotations.transformInplace(transformer, data)
+
+        return this
+    }
 }

@@ -11,18 +11,14 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.types.FirImplicitTypeRef
 
 class FirImplicitTypeRefImpl(
-    override val session: FirSession,
-    override val psi: PsiElement?
-) : FirImplicitTypeRef {
+    session: FirSession,
+    psi: PsiElement?
+) : FirImplicitTypeRef(session, psi) {
     override val annotations: List<FirAnnotationCall>
         get() = emptyList()
 }
 
-object FirComputingImplicitTypeRef : FirImplicitTypeRef {
-    override val psi: PsiElement?
-        get() = null
-    override val session: FirSession
-        get() = error("Session independent")
+object FirComputingImplicitTypeRef : FirImplicitTypeRef(FirTypingStubSession, null) {
     override val annotations: List<FirAnnotationCall>
         get() = emptyList()
 

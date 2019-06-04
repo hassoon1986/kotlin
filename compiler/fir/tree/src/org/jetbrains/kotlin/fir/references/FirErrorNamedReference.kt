@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.references
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirAbstractElement
 import org.jetbrains.kotlin.fir.FirNamedReference
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.name.Name
@@ -16,4 +15,4 @@ class FirErrorNamedReference(
     psi: PsiElement?,
     val errorReason: String,
     override val name: Name = Name.special("<$errorReason>")
-) : FirAbstractElement(session, psi), FirNamedReference
+) : FirNamedReference(session, psi)

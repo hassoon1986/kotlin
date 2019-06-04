@@ -5,12 +5,16 @@
 
 package org.jetbrains.kotlin.fir
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.Name
 
 @BaseTransformedType
-interface FirNamedReference : FirReference {
-    val name: Name
+abstract class FirNamedReference(
+    session: FirSession,
+    psi: PsiElement?
+) : FirReference(session, psi) {
+    abstract val name: Name
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitNamedReference(this, data)

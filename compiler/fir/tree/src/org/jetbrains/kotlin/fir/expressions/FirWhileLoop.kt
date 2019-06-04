@@ -5,9 +5,15 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirWhileLoop : FirLoop {
+abstract class FirWhileLoop(
+    session: FirSession,
+    psi: PsiElement?,
+    condition: FirExpression
+) : FirLoop(session, psi, condition) {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitWhileLoop(this, data)
 }

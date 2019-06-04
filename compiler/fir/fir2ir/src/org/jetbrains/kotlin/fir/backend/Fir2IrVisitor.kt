@@ -5,11 +5,13 @@
 
 package org.jetbrains.kotlin.fir.backend
 
-import org.jetbrains.kotlin.backend.common.descriptors.*
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedSimpleFunctionDescriptor
+import org.jetbrains.kotlin.backend.common.descriptors.WrappedValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.impl.*
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
 import org.jetbrains.kotlin.fir.descriptors.FirModuleDescriptor
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
@@ -21,23 +23,24 @@ import org.jetbrains.kotlin.fir.resolve.buildUseSiteScope
 import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.scopes.impl.FirClassSubstitutionScope
-import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTagImpl
-import org.jetbrains.kotlin.fir.symbols.ConeClassifierLookupTag
-import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
-import org.jetbrains.kotlin.fir.types.impl.*
+import org.jetbrains.kotlin.fir.types.impl.FirImplicitBooleanTypeRef
+import org.jetbrains.kotlin.fir.types.impl.FirImplicitNothingTypeRef
+import org.jetbrains.kotlin.fir.types.impl.FirImplicitStringTypeRef
+import org.jetbrains.kotlin.fir.types.impl.FirImplicitUnitTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.primitiveOp1
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
+import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
@@ -206,8 +209,8 @@ internal class Fir2IrVisitor(
             processedFunctionNames += name
             useSiteScope.processFunctionsByName(name) { functionSymbol ->
                 // TODO: think about overloaded functions. May be we should process all names.
-                if (functionSymbol is FirFunctionSymbol) {
-                    val originalFunction = functionSymbol.fir as FirNamedFunction
+                if (functionSymbol is FirNamedFunctionSymbol) {
+                    val originalFunction = functionSymbol.fir
                     val origin = IrDeclarationOrigin.FAKE_OVERRIDE
                     if (functionSymbol.isFakeOverride) {
                         // Substitution case
@@ -221,7 +224,7 @@ internal class Fir2IrVisitor(
                     } else if (fakeOverrideMode != FakeOverrideMode.SUBSTITUTION) {
                         // Trivial fake override case
                         val fakeOverrideSymbol = FirClassSubstitutionScope.createFakeOverride(session, originalFunction, functionSymbol)
-                        val fakeOverrideFunction = fakeOverrideSymbol.fir as FirNamedFunction
+                        val fakeOverrideFunction = fakeOverrideSymbol.fir
 
                         val irFunction = declarationStorage.getIrFunction(
                             fakeOverrideFunction, declarationStorage.findIrParent(originalFunction), origin = origin
@@ -277,7 +280,7 @@ internal class Fir2IrVisitor(
     private fun <T : IrFunction> T.setFunctionContent(
         descriptor: FunctionDescriptor,
         firFunction: FirFunction,
-        firOverriddenSymbol: FirFunctionSymbol? = null
+        firOverriddenSymbol: FirNamedFunctionSymbol? = null
     ): T {
         setParentByParentStack()
         withParent {
@@ -394,11 +397,11 @@ internal class Fir2IrVisitor(
         // TODO: find delegated constructor correctly
         val classId = constructedClassSymbol.classId
         val provider = this@Fir2IrVisitor.session.service<FirSymbolProvider>()
-        var constructorSymbol: FirCallableSymbol? = null
+        var constructorSymbol: FirConstructorSymbol? = null
         provider.getClassUseSiteMemberScope(classId, this@Fir2IrVisitor.session, ScopeSession())!!.processFunctionsByName(
             classId.shortClassName
         ) {
-            if (arguments.size <= ((it as FirFunctionSymbol).fir as FirFunction).valueParameters.size) {
+            if (arguments.size <= (it as FirConstructorSymbol).fir.valueParameters.size) {
                 constructorSymbol = it
                 ProcessorAction.STOP
             } else {
@@ -410,7 +413,7 @@ internal class Fir2IrVisitor(
             IrDelegatingConstructorCallImpl(
                 startOffset, endOffset,
                 constructedIrType,
-                declarationStorage.getIrFunctionSymbol(constructorSymbol as FirFunctionSymbol) as IrConstructorSymbol
+                declarationStorage.getIrFunctionSymbol(constructorSymbol!!) as IrConstructorSymbol
             ).apply {
                 for ((index, argument) in arguments.withIndex()) {
                     val argumentExpression = argument.toIrExpression()

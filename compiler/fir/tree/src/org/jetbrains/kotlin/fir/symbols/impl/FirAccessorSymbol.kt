@@ -5,10 +5,11 @@
 
 package org.jetbrains.kotlin.fir.symbols.impl
 
+import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
 import org.jetbrains.kotlin.fir.symbols.CallableId
 import org.jetbrains.kotlin.fir.symbols.ConePropertySymbol
 
 class FirAccessorSymbol(
     override val callableId: CallableId,
     val accessorId: CallableId
-) : ConePropertySymbol, FirCallableSymbol()
+) : ConePropertySymbol, FirCallableSymbol<FirNamedFunction>()

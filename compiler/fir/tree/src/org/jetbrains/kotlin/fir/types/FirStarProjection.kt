@@ -5,9 +5,14 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirStarProjection : FirTypeProjection {
+abstract class FirStarProjection(
+    session: FirSession,
+    psi: PsiElement?
+) : FirTypeProjection(session, psi) {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitStarProjection(this, data)
 }

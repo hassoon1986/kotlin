@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.symbols.ConeFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeVariableSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.name.Name
 
 class FirLocalScope : FirScope {
@@ -23,7 +22,7 @@ class FirLocalScope : FirScope {
     fun storeDeclaration(declaration: FirNamedDeclaration) {
         when (declaration) {
             is FirVariable -> properties[declaration.name] = declaration.symbol
-            is FirNamedFunction -> functions[declaration.name] = declaration.symbol as FirFunctionSymbol
+            is FirNamedFunction -> functions[declaration.name] = declaration.symbol as? ConeFunctionSymbol ?: return
         }
     }
 

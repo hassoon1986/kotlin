@@ -28,10 +28,7 @@ import org.jetbrains.kotlin.fir.scopes.impl.declaredMemberScope
 import org.jetbrains.kotlin.fir.symbols.CallableId
 import org.jetbrains.kotlin.fir.symbols.ConeCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFieldSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.ConeClassErrorType
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.FirResolvedTypeRefImpl
@@ -191,7 +188,7 @@ class JavaSymbolProvider(
                     for (javaMethod in javaClass.methods) {
                         val methodName = javaMethod.name
                         val methodId = CallableId(classId.packageFqName, classId.relativeClassName, methodName)
-                        val methodSymbol = FirFunctionSymbol(methodId)
+                        val methodSymbol = FirNamedFunctionSymbol(methodId)
                         val returnType = javaMethod.returnType
                         val firJavaMethod = FirJavaMethod(
                             this@JavaSymbolProvider.session, methodSymbol, methodName,
@@ -213,7 +210,7 @@ class JavaSymbolProvider(
                     val constructorId = CallableId(classId.packageFqName, classId.relativeClassName, classId.shortClassName)
 
                     fun addJavaConstructor(visibility: Visibility = Visibilities.PUBLIC): FirJavaConstructor {
-                        val constructorSymbol = FirFunctionSymbol(constructorId)
+                        val constructorSymbol = FirConstructorSymbol(constructorId)
                         val classTypeParameters = javaClass.typeParameters.convertTypeParameters(javaTypeParameterStack)
                         val firJavaConstructor = FirJavaConstructor(
                             this@JavaSymbolProvider.session, constructorSymbol, visibility,

@@ -5,19 +5,33 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.symbols.FirSymbolOwner
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.coneTypeSafe
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-interface FirTypeAlias : FirClassLikeDeclaration, FirSymbolOwner<FirTypeAlias> {
-    fun replaceExpandTypeRef(typeRef: FirTypeRef): FirTypeAlias
+abstract class FirTypeAlias(
+    session: FirSession,
+    psi: PsiElement?,
+    name: Name,
+    visibility: Visibility,
+    isExpect: Boolean,
+    isActual: Boolean
+) : FirClassLikeDeclaration<FirTypeAlias>(
+    session, psi, name, visibility, Modality.FINAL, isExpect, isActual
+), FirSymbolOwner<FirTypeAlias> {
+    abstract fun replaceExpandTypeRef(typeRef: FirTypeRef): FirTypeAlias
 
-    val expandedTypeRef: FirTypeRef
+    abstract val expandedTypeRef: FirTypeRef
 
-    override val symbol: FirTypeAliasSymbol
+    abstract override val symbol: FirTypeAliasSymbol
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitTypeAlias(this, data)

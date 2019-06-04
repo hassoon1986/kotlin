@@ -5,27 +5,31 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
-import org.jetbrains.kotlin.fir.expressions.FirStatement
-import org.jetbrains.kotlin.fir.symbols.ConeClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassifierSymbol
+import org.jetbrains.kotlin.fir.symbols.FirSymbolOwner
+import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
-import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-interface FirClassLikeDeclaration : @VisitedSupertype FirMemberDeclaration, FirStatement {
-    val symbol: ConeClassLikeSymbol
-
-    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
-        return super<FirMemberDeclaration>.accept(visitor, data)
-    }
-
-    override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        super<FirMemberDeclaration>.acceptChildren(visitor, data)
-    }
+abstract class FirClassLikeDeclaration<F : FirClassLikeDeclaration<F>>(
+    session: FirSession,
+    psi: PsiElement?,
+    name: Name,
+    visibility: Visibility,
+    modality: Modality?,
+    isExpect: Boolean,
+    isActual: Boolean
+) : @VisitedSupertype FirMemberDeclaration(session, psi, name, visibility, modality, isExpect, isActual), FirSymbolOwner<F> {
+    abstract override val symbol: FirClassLikeSymbol<F>
 }
 
-fun ConeClassifierSymbol.toFirClassLike(): FirClassLikeDeclaration? =
+fun ConeClassifierSymbol.toFirClassLike(): FirClassLikeDeclaration<*>? =
     when (this) {
         is FirClassSymbol -> this.fir
         is FirTypeAliasSymbol -> this.fir

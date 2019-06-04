@@ -26,7 +26,7 @@ open class FirValueParameterImpl(
     override val isNoinline: Boolean,
     override val isVararg: Boolean,
     override val symbol: FirVariableSymbol = FirVariableSymbol(name)
-) : FirAbstractNamedAnnotatedDeclaration(session, psi, name), FirValueParameter {
+) : FirValueParameter(session, psi, name) {
 
     init {
         symbol.bind(this)
@@ -45,7 +45,7 @@ open class FirValueParameterImpl(
         returnTypeRef = returnTypeRef.transformSingle(transformer, data)
         defaultValue = defaultValue?.transformSingle(transformer, data)
 
-        return super<FirAbstractNamedAnnotatedDeclaration>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 
     override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D) {

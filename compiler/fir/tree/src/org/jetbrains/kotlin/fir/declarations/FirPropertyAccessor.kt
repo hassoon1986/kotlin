@@ -5,16 +5,21 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirPropertyAccessor : @VisitedSupertype FirFunction, FirTypedDeclaration {
-    val isGetter: Boolean
+abstract class FirPropertyAccessor(
+    session: FirSession,
+    psi: PsiElement?
+) : @VisitedSupertype FirDeclarationWithBody(session, psi), FirFunction, FirTypedDeclaration {
+    abstract val isGetter: Boolean
 
     val isSetter: Boolean get() = !isGetter
 
-    val status: FirDeclarationStatus
+    abstract val status: FirDeclarationStatus
 
     val visibility: Visibility get() = status.visibility
 
@@ -22,11 +27,11 @@ interface FirPropertyAccessor : @VisitedSupertype FirFunction, FirTypedDeclarati
         visitor.visitPropertyAccessor(this, data)
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        super<FirTypedDeclaration>.acceptChildren(visitor, data)
+        super.acceptChildren(visitor, data)
+        returnTypeRef.accept(visitor, data)
         for (parameter in valueParameters) {
             parameter.accept(visitor, data)
         }
-        body?.accept(visitor, data)
         status.accept(visitor, data)
     }
 }

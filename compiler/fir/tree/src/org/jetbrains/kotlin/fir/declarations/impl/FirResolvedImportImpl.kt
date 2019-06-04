@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.fir.declarations.impl
 
-import org.jetbrains.kotlin.fir.FirAbstractElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirImport
 import org.jetbrains.kotlin.fir.declarations.FirResolvedImport
@@ -17,7 +16,7 @@ class FirResolvedImportImpl(
     val delegate: FirImport,
     override val packageFqName: FqName,
     override val relativeClassName: FqName?
-) : FirAbstractElement(session, delegate.psi), FirResolvedImport, FirImport {
+) : FirResolvedImport(session, delegate.psi) {
     override val aliasName: Name?
         get() = delegate.aliasName
 

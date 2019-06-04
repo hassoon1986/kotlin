@@ -12,9 +12,9 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
 class FirImportImpl(
-    override val session: FirSession,
-    override val psi: PsiElement?,
+    session: FirSession,
+    psi: PsiElement?,
     override val importedFqName: FqName?,
     override val isAllUnder: Boolean,
     override val aliasName: Name?
-) : FirImport
+) : FirImport(session, psi)

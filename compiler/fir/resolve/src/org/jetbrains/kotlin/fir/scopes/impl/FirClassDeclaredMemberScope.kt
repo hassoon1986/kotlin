@@ -37,11 +37,11 @@ fun declaredMemberScope(klass: FirRegularClass): FirClassDeclaredMemberScope {
 }
 
 class FirClassDeclaredMemberScope(klass: FirRegularClass) : FirScope {
-    private val callablesIndex: Map<Name, List<FirCallableSymbol>> = run {
-        val result = mutableMapOf<Name, MutableList<FirCallableSymbol>>()
+    private val callablesIndex: Map<Name, List<FirCallableSymbol<*>>> = run {
+        val result = mutableMapOf<Name, MutableList<FirCallableSymbol<*>>>()
         for (declaration in klass.declarations) {
             when (declaration) {
-                is FirCallableMemberDeclaration -> {
+                is FirCallableMemberDeclaration<*> -> {
                     val name = if (declaration is FirConstructor) klass.name else declaration.name
                     result.getOrPut(name) { mutableListOf() } += declaration.symbol
                 }

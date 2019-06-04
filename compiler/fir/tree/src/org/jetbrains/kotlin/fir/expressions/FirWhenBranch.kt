@@ -5,17 +5,22 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirWhenBranch : FirElement {
+abstract class FirWhenBranch(
+    session: FirSession,
+    psi: PsiElement?
+) : FirElement(session, psi) {
     // NB: we can represent subject, if it's inside, as a special kind of expression
     // when (mySubject) {
     //     $subj == 42$ -> doSmth()
     // }
-    val condition: FirExpression
+    abstract val condition: FirExpression
 
-    val result: FirBlock
+    abstract val result: FirBlock
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitWhenBranch(this, data)

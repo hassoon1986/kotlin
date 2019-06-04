@@ -5,15 +5,21 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-interface FirResolvedImport : FirImport {
-    val packageFqName: FqName
+abstract class FirResolvedImport(
+    session: FirSession,
+    psi: PsiElement?
+) : FirImport(session, psi) {
+    abstract val packageFqName: FqName
 
-    val relativeClassName: FqName?
+    abstract val relativeClassName: FqName?
+
     val resolvedClassId: ClassId? get() = relativeClassName?.let { ClassId(packageFqName, it, false) }
 
     val importedName: Name? get() = importedFqName?.shortName()

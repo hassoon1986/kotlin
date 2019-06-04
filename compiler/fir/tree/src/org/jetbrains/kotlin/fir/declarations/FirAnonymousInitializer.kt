@@ -5,10 +5,15 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
 // Probably not a function
-interface FirAnonymousInitializer : FirDeclarationWithBody {
+abstract class FirAnonymousInitializer(
+    session: FirSession,
+    psi: PsiElement?
+) : FirDeclarationWithBody(session, psi) {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitAnonymousInitializer(this, data)
 }

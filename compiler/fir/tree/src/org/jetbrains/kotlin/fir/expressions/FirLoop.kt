@@ -5,14 +5,19 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
-import org.jetbrains.kotlin.fir.FirLabeledElement
-import org.jetbrains.kotlin.fir.VisitedSupertype
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.*
+import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirLoop : @VisitedSupertype FirStatement, FirLabeledElement, FirAnnotationContainer {
-    val condition: FirExpression
+abstract class FirLoop(
+    session: FirSession,
+    psi: PsiElement?,
+    var condition: FirExpression
+) : @VisitedSupertype FirStatement(session, psi), FirLabeledElement, FirAnnotationContainer {
+    lateinit var block: FirBlock
 
-    val block: FirBlock
+    override var label: FirLabel? = null
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitLoop(this, data)
@@ -20,6 +25,14 @@ interface FirLoop : @VisitedSupertype FirStatement, FirLabeledElement, FirAnnota
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
         condition.accept(visitor, data)
         block.accept(visitor, data)
-        super<FirLabeledElement>.acceptChildren(visitor, data)
+        label?.accept(visitor, data)
+        super.acceptChildren(visitor, data)
+    }
+
+    override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
+        condition = condition.transformSingle(transformer, data)
+        block = block.transformSingle(transformer, data)
+        label = label?.transformSingle(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

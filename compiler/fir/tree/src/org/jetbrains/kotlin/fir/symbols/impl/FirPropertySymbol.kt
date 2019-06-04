@@ -5,14 +5,16 @@
 
 package org.jetbrains.kotlin.fir.symbols.impl
 
+import org.jetbrains.kotlin.fir.declarations.FirProperty
+import org.jetbrains.kotlin.fir.expressions.FirVariable
 import org.jetbrains.kotlin.fir.symbols.CallableId
 import org.jetbrains.kotlin.fir.symbols.ConePropertySymbol
 import org.jetbrains.kotlin.fir.symbols.ConeVariableSymbol
 import org.jetbrains.kotlin.name.Name
 
-open class FirPropertySymbol(callableId: CallableId) : FirVariableSymbol(callableId), ConePropertySymbol
+open class FirPropertySymbol(override val callableId: CallableId) : ConePropertySymbol, FirCallableSymbol<FirProperty>()
 
-open class FirVariableSymbol(override val callableId: CallableId) : ConeVariableSymbol, FirCallableSymbol() {
+class FirVariableSymbol(override val callableId: CallableId) : ConeVariableSymbol, FirCallableSymbol<FirVariable>() {
 
     @Deprecated("TODO: Better solution for local vars?")
     constructor(name: Name) : this(CallableId(name))  // TODO?

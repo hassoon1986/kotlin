@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
 import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.idea.fir.coneTypeSafe
 import org.jetbrains.kotlin.idea.fir.getOrBuildFir
@@ -26,7 +26,7 @@ class TypeFromNestedClassInspection : AbstractKotlinInspection() {
             if (function.isLocal) return
             val returnTypeReference = function.typeReference ?: return
             val firFunction = function.getOrBuildFir() as FirNamedFunction
-            val firFunctionId = (firFunction.symbol as? FirFunctionSymbol)?.callableId ?: return
+            val firFunctionId = firFunction.symbol.callableId
 
             val coneType = firFunction.coneTypeSafe as? ConeClassLikeType ?: return
             val typeId = (coneType.lookupTag.toSymbol(function.session) as? ConeClassSymbol)?.classId ?: return

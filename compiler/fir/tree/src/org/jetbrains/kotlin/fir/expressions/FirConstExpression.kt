@@ -5,12 +5,19 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.expressions.impl.FirAbstractExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.ir.expressions.IrConstKind
 
-interface FirConstExpression<T> : FirExpression {
-    val kind: IrConstKind<T>
-    val value: T
+abstract class FirConstExpression<T>(
+    session: FirSession,
+    psi: PsiElement?
+) : FirAbstractExpression(session, psi) {
+    abstract val kind: IrConstKind<T>
+
+    abstract val value: T
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
         return visitor.visitConstExpression(this, data)

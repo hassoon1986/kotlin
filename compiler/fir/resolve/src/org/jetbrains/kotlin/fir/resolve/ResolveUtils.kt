@@ -5,11 +5,8 @@
 
 package org.jetbrains.kotlin.fir.resolve
 
-import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.FirSymbolProviderAwareSession
+import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.render
-import org.jetbrains.kotlin.fir.service
 import org.jetbrains.kotlin.fir.symbols.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
 import org.jetbrains.kotlin.fir.types.*
@@ -162,5 +159,5 @@ fun FirFunction.constructFunctionalTypeRef(session: FirSession): FirResolvedType
     val functionalTypeId = StandardClassIds.byName("Function${receiverAndParameterTypes.size - 1}")
     val functionalType = functionalTypeId(session.service()).constructType(receiverAndParameterTypes.toTypedArray(), isNullable = false)
 
-    return FirResolvedTypeRefImpl(session, psi, functionalType)
+    return FirResolvedTypeRefImpl(session, (this as? FirElement)?.psi, functionalType)
 }

@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.fir.java.declarations.FirJavaClass
 import org.jetbrains.kotlin.fir.java.toNotNullConeKotlinType
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
-import org.jetbrains.kotlin.fir.resolve.transformers.firUnsafe
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.scopes.ProcessorAction.*
@@ -22,9 +21,7 @@ import org.jetbrains.kotlin.fir.symbols.ConeCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeVariableSymbol
 import org.jetbrains.kotlin.fir.symbols.*
-import org.jetbrains.kotlin.fir.symbols.impl.FirAccessorSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.typeContext
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
@@ -65,8 +62,8 @@ class JavaClassUseSiteScope(
         )
 
     private fun isOverriddenFunCheck(overriddenInJava: FirFunction, base: FirFunction): Boolean {
-        overriddenInJava as FirCallableMemberDeclaration
-        val receiverTypeRef = (base as FirCallableMemberDeclaration).receiverTypeRef
+        overriddenInJava as FirCallableMemberDeclaration<*>
+        val receiverTypeRef = (base as FirCallableMemberDeclaration<*>).receiverTypeRef
         val baseParameterTypes = listOfNotNull(receiverTypeRef) + base.valueParameters.map { it.returnTypeRef }
 
         if (overriddenInJava.valueParameters.size != baseParameterTypes.size) return false
@@ -128,25 +125,24 @@ class JavaClassUseSiteScope(
         if (overriddenByBase.containsKey(this)) return overriddenByBase[this]
 
         val overriding = when (this) {
-            is FirFunctionSymbol -> {
-                val self = firUnsafe<FirFunction>()
-                self as FirCallableMemberDeclaration
+            is FirNamedFunctionSymbol -> {
+                val self = fir
                 candidates.firstOrNull {
-                    val overridden = (it as? FirFunctionSymbol)?.fir as? FirFunction
+                    val overridden = (it as? FirNamedFunctionSymbol)?.fir
                     overridden != null && self.modality != Modality.FINAL && isOverriddenFunCheck(overridden, self)
                 }
             }
             is FirPropertySymbol -> {
-                val self = fir as? FirProperty ?: return null
+                val self = fir
                 candidates.firstOrNull {
                     when (it) {
-                        is FirFunctionSymbol -> {
-                            val overridden = it.fir as FirNamedFunction
+                        is FirNamedFunctionSymbol -> {
+                            val overridden = it.fir
                             self.modality != Modality.FINAL && isOverriddenPropertyCheck(overridden, self)
                         }
                         is FirPropertySymbol -> {
                             val overridden = it.fir
-                            overridden is FirProperty && self.modality != Modality.FINAL && isOverriddenPropertyCheck(overridden, self)
+                            self.modality != Modality.FINAL && isOverriddenPropertyCheck(overridden, self)
                         }
                         else -> false
                     }
@@ -154,12 +150,14 @@ class JavaClassUseSiteScope(
                 }
             }
             is FirAccessorSymbol -> {
-                val self = fir as FirNamedFunction
+                val self = fir
                 candidates.firstOrNull {
-                    val overridden = (it as? FirFunctionSymbol)?.fir as? FirNamedFunction
+                    val overridden = (it as? FirNamedFunctionSymbol)?.fir
                     overridden != null && self.modality != Modality.FINAL && isOverriddenFunCheck(overridden, self)
                 }
             }
+            is FirFieldSymbol -> return null
+            is FirConstructorSymbol -> return null
             else -> error("Unexpected callable symbol: $this")
         }
         // TODO: two or more overrides for one fun?
@@ -201,19 +199,17 @@ class JavaClassUseSiteScope(
         ) return STOP
         if (klass is FirJavaClass) {
             if (!declaredMemberScope.processFunctionsByName(accessorName) { functionSymbol ->
-                    if (functionSymbol is FirFunctionSymbol) {
+                    if (functionSymbol is FirNamedFunctionSymbol) {
                         val fir = functionSymbol.fir
-                        if (fir is FirNamedFunction) {
-                            if (fir.isStatic) {
+                        if (fir.isStatic) {
+                            return@processFunctionsByName NEXT
+                        }
+                        when (isGetter) {
+                            true -> if (fir.valueParameters.isNotEmpty()) {
                                 return@processFunctionsByName NEXT
                             }
-                            when (isGetter) {
-                                true -> if (fir.valueParameters.isNotEmpty()) {
-                                    return@processFunctionsByName NEXT
-                                }
-                                false -> if (fir.valueParameters.size != 1) {
-                                    return@processFunctionsByName NEXT
-                                }
+                            false -> if (fir.valueParameters.size != 1) {
+                                return@processFunctionsByName NEXT
                             }
                         }
                     }
@@ -223,7 +219,7 @@ class JavaClassUseSiteScope(
                         callableId = CallableId(functionSymbol.callableId.packageName, functionSymbol.callableId.className, propertyName)
                     )
                     if (functionSymbol is FirBasedSymbol<*>) {
-                        (functionSymbol.fir as? FirCallableMemberDeclaration)?.let { callableMember -> accessorSymbol.bind(callableMember) }
+                        (functionSymbol.fir as? FirNamedFunction)?.let { callableMember -> accessorSymbol.bind(callableMember) }
                     }
                     processor(accessorSymbol)
                 }
@@ -231,7 +227,7 @@ class JavaClassUseSiteScope(
         }
 
         return superTypesScope.processPropertiesByName(propertyName) {
-            val firCallableMember = (it as FirBasedSymbol<*>).fir as? FirCallableMemberDeclaration
+            val firCallableMember = (it as FirBasedSymbol<*>).fir as? FirCallableMemberDeclaration<*>
             if (firCallableMember?.isStatic == true) {
                 NEXT
             } else {

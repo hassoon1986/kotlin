@@ -5,13 +5,25 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
-import org.jetbrains.kotlin.fir.BaseTransformedType
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
-import org.jetbrains.kotlin.fir.expressions.FirCall
+import org.jetbrains.kotlin.fir.expressions.FirArgumentContainer
+import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-@BaseTransformedType
-interface FirEnumEntry : @VisitedSupertype FirRegularClass, FirCall {
+abstract class FirEnumEntry(
+    session: FirSession,
+    psi: PsiElement?,
+    name: Name
+) : @VisitedSupertype FirRegularClass(session, psi, name, Visibilities.UNKNOWN, Modality.FINAL, false, false), FirArgumentContainer {
+    abstract val typeRef: FirTypeRef
+
+    abstract fun replaceTypeRef(newTypeRef: FirTypeRef)
+
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitEnumEntry(this, data)
 
@@ -20,6 +32,6 @@ interface FirEnumEntry : @VisitedSupertype FirRegularClass, FirCall {
             argument.accept(visitor, data)
         }
         typeRef.accept(visitor, data)
-        super<FirRegularClass>.acceptChildren(visitor, data)
+        super.acceptChildren(visitor, data)
     }
 }

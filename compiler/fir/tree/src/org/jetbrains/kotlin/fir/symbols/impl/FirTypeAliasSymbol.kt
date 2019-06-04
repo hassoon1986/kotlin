@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.symbols.impl
 
 import org.jetbrains.kotlin.fir.declarations.FirTypeAlias
-import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeLookupTag
 import org.jetbrains.kotlin.fir.symbols.ConeTypeAliasLookupTag
 import org.jetbrains.kotlin.fir.symbols.ConeTypeAliasSymbol
@@ -14,7 +13,7 @@ import org.jetbrains.kotlin.name.ClassId
 
 class FirTypeAliasSymbol(
     override val classId: ClassId
-) : ConeTypeAliasSymbol, AbstractFirBasedSymbol<FirTypeAlias>() {
+) : ConeTypeAliasSymbol, FirClassLikeSymbol<FirTypeAlias>() {
     override fun toLookupTag(): ConeClassLikeLookupTag = TypeAliasLookupTagImpl(classId)
 
     override fun equals(other: Any?): Boolean =

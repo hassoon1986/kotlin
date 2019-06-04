@@ -71,7 +71,7 @@ class FirProviderImpl(val session: FirSession) : FirProvider {
                 state.classifierContainerFileMap[classId] = file
             }
 
-            override fun visitCallableMemberDeclaration(callableMemberDeclaration: FirCallableMemberDeclaration) {
+            override fun <F : FirCallableMemberDeclaration<F>> visitCallableMemberDeclaration(callableMemberDeclaration: FirCallableMemberDeclaration<F>) {
                 val symbol = callableMemberDeclaration.symbol as ConeCallableSymbol
                 val callableId = symbol.callableId
                 state.callableMap.merge(callableId, listOf(symbol)) { a, b -> a + b }
@@ -96,7 +96,7 @@ class FirProviderImpl(val session: FirSession) : FirProvider {
 
     private class State {
         val fileMap = mutableMapOf<FqName, List<FirFile>>()
-        val classifierMap = mutableMapOf<ClassId, FirClassLikeDeclaration>()
+        val classifierMap = mutableMapOf<ClassId, FirClassLikeDeclaration<*>>()
         val classifierContainerFileMap = mutableMapOf<ClassId, FirFile>()
         val callableMap = mutableMapOf<CallableId, List<ConeCallableSymbol>>()
         val callableContainerMap = mutableMapOf<ConeCallableSymbol, FirFile>()
@@ -120,7 +120,7 @@ class FirProviderImpl(val session: FirSession) : FirProvider {
         return state.fileMap[fqName].orEmpty()
     }
 
-    override fun getFirClassifierByFqName(fqName: ClassId): FirClassLikeDeclaration? {
+    override fun getFirClassifierByFqName(fqName: ClassId): FirClassLikeDeclaration<*>? {
         return state.classifierMap[fqName]
     }
 

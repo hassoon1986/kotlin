@@ -5,11 +5,17 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirWhenSubject
+import org.jetbrains.kotlin.fir.expressions.impl.FirAbstractExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirWhenSubjectExpression : FirExpression {
-    val whenSubject: FirWhenSubject
+abstract class FirWhenSubjectExpression(
+    session: FirSession,
+    psi: PsiElement?
+) : FirAbstractExpression(session, psi) {
+    abstract val whenSubject: FirWhenSubject
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitWhenSubjectExpression(this, data)

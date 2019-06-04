@@ -5,11 +5,16 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.fir.FirSession
 
-interface FirResolvedDeclarationStatus : FirDeclarationStatus {
-    override val visibility: Visibility
+abstract class FirResolvedDeclarationStatus(
+    session: FirSession,
+    psi: PsiElement?
+) : FirDeclarationStatus(session, psi) {
+    abstract override val visibility: Visibility
 
-    override val modality: Modality
+    abstract override val modality: Modality
 }

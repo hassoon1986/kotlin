@@ -38,9 +38,9 @@ class FirMemberPropertyImpl(
     override var getter: FirPropertyAccessor,
     override var setter: FirPropertyAccessor?,
     override var delegate: FirExpression?
-) : FirAbstractCallableMember(
+) : FirProperty(
     session, psi, name, visibility, modality, isExpect, isActual, isOverride, receiverTypeRef, returnTypeRef
-), FirProperty {
+) {
     init {
         symbol.bind(this)
         status.isConst = isConst
@@ -53,6 +53,6 @@ class FirMemberPropertyImpl(
         initializer = initializer?.transformSingle(transformer, data)
         delegate = delegate?.transformSingle(transformer, data)
 
-        return super<FirAbstractCallableMember>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

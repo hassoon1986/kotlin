@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.transformSingle
-import org.jetbrains.kotlin.fir.types.FirImplicitTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
@@ -18,7 +17,7 @@ import org.jetbrains.kotlin.fir.visitors.FirTransformer
 abstract class FirAbstractExpression(
     session: FirSession,
     psi: PsiElement?
-) : FirAbstractStatement(session, psi), FirExpression {
+) : FirExpression(session, psi) {
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(session, null)
 
     override fun replaceTypeRef(newTypeRef: FirTypeRef) {
@@ -28,6 +27,6 @@ abstract class FirAbstractExpression(
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         typeRef = typeRef.transformSingle(transformer, data)
 
-        return super<FirAbstractStatement>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

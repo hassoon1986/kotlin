@@ -5,9 +5,15 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirDynamicTypeRef : FirTypeRefWithNullability {
+abstract class FirDynamicTypeRef(
+    session: FirSession,
+    psi: PsiElement?,
+    isMarkedNullable: Boolean
+) : FirTypeRefWithNullability(session, psi, isMarkedNullable) {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitDynamicTypeRef(this, data)
 }

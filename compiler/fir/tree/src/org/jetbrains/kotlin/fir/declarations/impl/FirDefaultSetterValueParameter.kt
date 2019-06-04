@@ -21,7 +21,7 @@ class FirDefaultSetterValueParameter(
     psi: PsiElement?,
     override var returnTypeRef: FirTypeRef,
     override val symbol: FirVariableSymbol = FirVariableSymbol(name)
-) : FirAbstractNamedAnnotatedDeclaration(session, psi, name), FirValueParameter {
+) : FirValueParameter(session, psi, name) {
 
     init {
         symbol.bind(this)
@@ -41,14 +41,13 @@ class FirDefaultSetterValueParameter(
     override val isVararg = false
 
     override val isVar: Boolean = false
-    override val isVal: Boolean = false
 
     override val defaultValue: FirExpression? = null
 
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         returnTypeRef = returnTypeRef.transformSingle(transformer, data)
 
-        return super<FirAbstractNamedAnnotatedDeclaration>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 
     override fun <D> transformReturnTypeRef(transformer: FirTransformer<D>, data: D) {

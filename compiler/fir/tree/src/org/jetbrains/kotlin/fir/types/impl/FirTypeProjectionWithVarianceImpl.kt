@@ -15,11 +15,11 @@ import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.types.Variance
 
 class FirTypeProjectionWithVarianceImpl(
-    override val session: FirSession,
-    override val psi: PsiElement?,
+    session: FirSession,
+    psi: PsiElement?,
     override val variance: Variance,
     override var typeRef: FirTypeRef
-) : FirTypeProjectionWithVariance {
+) : FirTypeProjectionWithVariance(session, psi) {
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         typeRef = typeRef.transformSingle(transformer, data)
 

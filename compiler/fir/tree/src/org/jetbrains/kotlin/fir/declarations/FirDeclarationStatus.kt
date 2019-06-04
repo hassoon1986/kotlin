@@ -10,43 +10,138 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.BaseTransformedType
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirDeclarationStatus.Modifier.*
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
 @BaseTransformedType
-interface FirDeclarationStatus : FirElement {
-    val visibility: Visibility
+abstract class FirDeclarationStatus(
+    session: FirSession,
+    psi: PsiElement?
+) : FirElement(session, psi) {
+    abstract val visibility: Visibility
 
-    val modality: Modality?
+    abstract val modality: Modality?
 
-    val isExpect: Boolean
+    protected var flags: Int = 0
 
-    val isActual: Boolean
+    private operator fun get(modifier: Modifier): Boolean = (flags and modifier.mask) != 0
 
-    val isOverride: Boolean
+    private operator fun set(modifier: Modifier, value: Boolean) {
+        flags = if (value) {
+            flags or modifier.mask
+        } else {
+            flags and modifier.mask.inv()
+        }
+    }
 
-    val isOperator: Boolean
+    var isExpect: Boolean
+        get() = this[EXPECT]
+        set(value) {
+            this[EXPECT] = value
+        }
 
-    val isInfix: Boolean
+    var isActual: Boolean
+        get() = this[ACTUAL]
+        set(value) {
+            this[ACTUAL] = value
+        }
 
-    val isInline: Boolean
+    var isOverride: Boolean
+        get() = this[OVERRIDE]
+        set(value) {
+            this[OVERRIDE] = value
+        }
 
-    val isTailRec: Boolean
+    var isOperator: Boolean
+        get() = this[OPERATOR]
+        set(value) {
+            this[OPERATOR] = value
+        }
 
-    val isExternal: Boolean
+    var isInfix: Boolean
+        get() = this[INFIX]
+        set(value) {
+            this[INFIX] = value
+        }
 
-    val isConst: Boolean
+    var isInline: Boolean
+        get() = this[INLINE]
+        set(value) {
+            this[INLINE] = value
+        }
 
-    val isLateInit: Boolean
+    var isTailRec: Boolean
+        get() = this[TAILREC]
+        set(value) {
+            this[TAILREC] = value
+        }
 
-    val isInner: Boolean
+    var isExternal: Boolean
+        get() = this[EXTERNAL]
+        set(value) {
+            this[EXTERNAL] = value
+        }
 
-    val isCompanion: Boolean
+    var isConst: Boolean
+        get() = this[CONST]
+        set(value) {
+            this[CONST] = value
+        }
 
-    val isData: Boolean
+    var isLateInit: Boolean
+        get() = this[LATEINIT]
+        set(value) {
+            this[LATEINIT] = value
+        }
 
-    val isSuspend: Boolean
+    var isInner: Boolean
+        get() = this[INNER]
+        set(value) {
+            this[INNER] = value
+        }
 
-    val isStatic: Boolean
+    var isCompanion: Boolean
+        get() = this[COMPANION]
+        set(value) {
+            this[COMPANION] = value
+        }
+
+    var isData: Boolean
+        get() = this[DATA]
+        set(value) {
+            this[DATA] = value
+        }
+
+    var isSuspend: Boolean
+        get() = this[SUSPEND]
+        set(value) {
+            this[SUSPEND] = value
+        }
+
+    var isStatic: Boolean
+        get() = this[STATIC]
+        set(value) {
+            this[STATIC] = value
+        }
+
+    private enum class Modifier(val mask: Int) {
+        EXPECT(0x1),
+        ACTUAL(0x2),
+        OVERRIDE(0x4),
+        OPERATOR(0x8),
+        INFIX(0x10),
+        INLINE(0x20),
+        TAILREC(0x40),
+        EXTERNAL(0x80),
+        CONST(0x100),
+        LATEINIT(0x200),
+        INNER(0x400),
+        COMPANION(0x800),
+        DATA(0x1000),
+        SUSPEND(0x2000),
+        STATIC(0x4000)
+    }
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitDeclarationStatus(this, data)

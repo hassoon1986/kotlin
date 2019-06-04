@@ -5,31 +5,33 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.BaseTransformedType
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirVariable
-import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-@BaseTransformedType
-interface FirValueParameter : @VisitedSupertype FirDeclaration, FirTypedDeclaration, FirNamedDeclaration, FirVariable {
-    val isCrossinline: Boolean
+abstract class FirValueParameter(
+    session: FirSession,
+    psi: PsiElement?,
+    name: Name
+) : @VisitedSupertype FirVariable(session, psi, name), FirTypedDeclaration {
+    abstract val isCrossinline: Boolean
 
-    val isNoinline: Boolean
+    abstract val isNoinline: Boolean
 
-    val isVararg: Boolean
+    abstract val isVararg: Boolean
 
-    val defaultValue: FirExpression?
-
-    override val symbol: FirVariableSymbol
+    abstract val defaultValue: FirExpression?
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitValueParameter(this, data)
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        super<FirVariable>.acceptChildren(visitor, data)
+        super.acceptChildren(visitor, data)
         defaultValue?.accept(visitor, data)
     }
 }

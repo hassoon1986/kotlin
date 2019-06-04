@@ -5,12 +5,17 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.symbols.FirSymbolOwner
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.Name
 
-interface FirNamedDeclaration : FirDeclaration {
+abstract class FirNamedDeclaration(
+    session: FirSession,
+    psi: PsiElement?,
     val name: Name
-
+) : FirDeclaration(session, psi) {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitNamedDeclaration(this, data)
 }

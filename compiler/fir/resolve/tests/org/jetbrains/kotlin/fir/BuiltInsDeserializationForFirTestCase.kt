@@ -42,7 +42,7 @@ class BuiltInsDeserializationForFirTestCase : AbstractFirResolveWithSessionTestC
 
         for (name in provider.getAllCallableNamesInPackage(packageFqName)) {
             for (symbol in provider.getTopLevelCallableSymbols(packageFqName, name)) {
-                (symbol as FirCallableSymbol).fir.accept(firRenderer)
+                (symbol as FirCallableSymbol<*>).fir.accept(firRenderer)
                 builder.appendln()
             }
         }

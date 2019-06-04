@@ -5,11 +5,17 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.expressions.impl.FirAbstractExpression
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirClassReferenceExpression : FirExpression {
-    val classTypeRef: FirTypeRef
+abstract class FirClassReferenceExpression(
+    session: FirSession,
+    psi: PsiElement?
+) : FirAbstractExpression(session, psi) {
+    abstract val classTypeRef: FirTypeRef
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitClassReferenceExpression(this, data)

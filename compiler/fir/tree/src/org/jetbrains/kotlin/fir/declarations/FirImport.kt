@@ -5,19 +5,24 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.BaseTransformedType
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
 @BaseTransformedType
-interface FirImport : FirElement {
-    val importedFqName: FqName?
+abstract class FirImport(
+    session: FirSession,
+    psi: PsiElement?
+) : FirElement(session, psi) {
+    abstract val importedFqName: FqName?
 
-    val isAllUnder: Boolean
+    abstract val isAllUnder: Boolean
 
-    val aliasName: Name?
+    abstract val aliasName: Name?
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitImport(this, data)

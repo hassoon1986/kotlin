@@ -5,14 +5,68 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
-import org.jetbrains.kotlin.fir.BaseTransformedType
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
-import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.FirSymbolOwner
+import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-@BaseTransformedType
-interface FirNamedFunction : @VisitedSupertype FirFunction, FirCallableMemberDeclaration, FirMemberDeclaration {
+abstract class FirNamedFunction :
+    @VisitedSupertype FirCallableMemberDeclaration<FirNamedFunction>, FirFunction, FirSymbolOwner<FirNamedFunction> {
+
+    // NB: FirNamedFunctionSymbol or FirAccessorSymbol
+    override val symbol: FirCallableSymbol<FirNamedFunction>
+
+    constructor(
+        session: FirSession,
+        psi: PsiElement?,
+        symbol: FirCallableSymbol<FirNamedFunction>,
+        name: Name,
+        receiverTypeRef: FirTypeRef?,
+        returnTypeRef: FirTypeRef
+    ) : super(session, psi, name, receiverTypeRef, returnTypeRef) {
+        this.symbol = symbol
+        symbol.bind(this)
+    }
+
+    constructor(
+        session: FirSession,
+        psi: PsiElement?,
+        symbol: FirNamedFunctionSymbol,
+        name: Name,
+        visibility: Visibility,
+        modality: Modality?,
+        isExpect: Boolean,
+        isActual: Boolean,
+        isOverride: Boolean,
+        isOperator: Boolean,
+        isInfix: Boolean,
+        isInline: Boolean,
+        isTailRec: Boolean,
+        isExternal: Boolean,
+        isSuspend: Boolean,
+        receiverTypeRef: FirTypeRef?,
+        returnTypeRef: FirTypeRef
+    ) : super(
+        session, psi, name, visibility, modality,
+        isExpect, isActual, isOverride, receiverTypeRef, returnTypeRef
+    ) {
+        status.isOperator = isOperator
+        status.isInfix = isInfix
+        status.isInline = isInline
+        status.isTailRec = isTailRec
+        status.isExternal = isExternal
+        status.isSuspend = isSuspend
+        this.symbol = symbol
+        symbol.bind(this)
+    }
+
     val isOperator: Boolean get() = status.isOperator
 
     val isInfix: Boolean get() = status.isInfix
@@ -25,13 +79,11 @@ interface FirNamedFunction : @VisitedSupertype FirFunction, FirCallableMemberDec
 
     val isSuspend: Boolean get() = status.isSuspend
 
-    override val isOverride: Boolean get() = status.isOverride
-
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitNamedFunction(this, data)
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        super<FirCallableMemberDeclaration>.acceptChildren(visitor, data)
+        super.acceptChildren(visitor, data)
         for (parameter in valueParameters) {
             parameter.accept(visitor, data)
         }

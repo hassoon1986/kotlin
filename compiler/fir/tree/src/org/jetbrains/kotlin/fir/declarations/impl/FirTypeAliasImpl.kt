@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.declarations.impl
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
@@ -26,7 +25,7 @@ class FirTypeAliasImpl(
     isExpect: Boolean,
     isActual: Boolean,
     override var expandedTypeRef: FirTypeRef
-) : FirAbstractMemberDeclaration(session, psi, name, visibility, Modality.FINAL, isExpect, isActual), FirTypeAlias {
+) : FirTypeAlias(session, psi, name, visibility, isExpect, isActual) {
 
     init {
         symbol.bind(this)
@@ -40,6 +39,6 @@ class FirTypeAliasImpl(
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         expandedTypeRef = expandedTypeRef.transformSingle(transformer, data)
 
-        return super<FirAbstractMemberDeclaration>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

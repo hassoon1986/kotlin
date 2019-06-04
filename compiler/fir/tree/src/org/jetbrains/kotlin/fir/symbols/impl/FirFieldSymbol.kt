@@ -5,4 +5,8 @@
 
 package org.jetbrains.kotlin.fir.symbols.impl
 
-typealias FirFieldSymbol = FirPropertySymbol
+import org.jetbrains.kotlin.fir.declarations.FirField
+import org.jetbrains.kotlin.fir.symbols.CallableId
+import org.jetbrains.kotlin.fir.symbols.ConePropertySymbol
+
+class FirFieldSymbol(override val callableId: CallableId) : ConePropertySymbol, FirCallableSymbol<FirField>()

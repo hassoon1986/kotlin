@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.fir.resolve.calls
 
-import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirCallableMemberDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirConstructor
 import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutorByMap
@@ -51,8 +51,7 @@ class ConeOverloadConflictResolver(
     }
 
     private fun createFlatSignature(call: Candidate): FlatSignature<Candidate> {
-        val declaration = call.symbol.firUnsafe<FirCallableDeclaration>()
-        return when (declaration) {
+        return when (val declaration = call.symbol.firUnsafe<FirCallableMemberDeclaration<*>>()) {
             is FirNamedFunction -> createFlatSignature(call, declaration)
             is FirConstructor -> createFlatSignature(call, declaration)
             else -> error("Not supported: $declaration")

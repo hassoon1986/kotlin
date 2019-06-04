@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.fir.declarations.impl
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirAbstractElement
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirErrorDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirFunction
@@ -19,16 +19,11 @@ class FirErrorFunction(
     session: FirSession,
     psi: PsiElement?,
     override val reason: String
-) : FirAbstractElement(session, psi), FirErrorDeclaration, FirFunction {
-    override val annotations: List<FirAnnotationCall>
-        get() = emptyList()
+) : FirErrorDeclaration(session, psi), FirFunction {
 
     override val valueParameters: List<FirValueParameter>
         get() = emptyList()
 
     override val body: FirBlock?
         get() = null
-
-    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
-        super<FirFunction>.accept(visitor, data)
 }

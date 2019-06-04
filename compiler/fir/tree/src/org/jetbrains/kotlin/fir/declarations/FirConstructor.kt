@@ -5,19 +5,55 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.BaseTransformedType
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.expressions.FirDelegatedConstructorCall
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
+import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-@BaseTransformedType
-interface FirConstructor : @VisitedSupertype FirFunction, FirCallableMemberDeclaration {
+abstract class FirConstructor : @VisitedSupertype FirCallableMemberDeclaration<FirConstructor>, FirFunction, FirBodyContainer {
 
-    val isPrimary: Boolean get() = false
-
-    override val isOverride: Boolean get() = status.isOverride
+    override val symbol: FirConstructorSymbol
 
     val delegatedConstructor: FirDelegatedConstructorCall?
+
+    constructor(
+        session: FirSession,
+        psi: PsiElement?,
+        symbol: FirConstructorSymbol,
+        visibility: Visibility,
+        isExpect: Boolean,
+        isActual: Boolean,
+        delegatedSelfTypeRef: FirTypeRef,
+        delegatedConstructor: FirDelegatedConstructorCall?
+    ) : super(
+        session, psi, NAME, visibility, Modality.FINAL,
+        isExpect, isActual, isOverride = false, receiverTypeRef = null, returnTypeRef = delegatedSelfTypeRef
+    ) {
+        this.symbol = symbol
+        this.delegatedConstructor = delegatedConstructor
+        symbol.bind(this)
+    }
+
+    constructor(
+        session: FirSession,
+        psi: PsiElement?,
+        symbol: FirConstructorSymbol,
+        receiverTypeRef: FirTypeRef?,
+        returnTypeRef: FirTypeRef
+    ) : super(session, psi, NAME, receiverTypeRef, returnTypeRef) {
+        this.symbol = symbol
+        this.delegatedConstructor = null
+        symbol.bind(this)
+    }
+
+    open val isPrimary: Boolean get() = false
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitConstructor(this, data)
@@ -31,5 +67,9 @@ interface FirConstructor : @VisitedSupertype FirFunction, FirCallableMemberDecla
         }
         returnTypeRef.accept(visitor, data)
         body?.accept(visitor, data)
+    }
+
+    companion object {
+        val NAME = Name.special("<init>")
     }
 }

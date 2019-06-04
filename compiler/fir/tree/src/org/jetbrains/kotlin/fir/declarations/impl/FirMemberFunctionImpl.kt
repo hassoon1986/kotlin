@@ -13,33 +13,28 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.transformInplace
 import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
 import org.jetbrains.kotlin.name.Name
 
-open class FirMemberFunctionImpl : FirAbstractCallableMember, FirNamedFunction, FirModifiableFunction {
-
-    override val symbol: FirCallableSymbol
+open class FirMemberFunctionImpl : FirNamedFunction, FirModifiableFunction {
 
     constructor(
         session: FirSession,
         psi: PsiElement?,
-        symbol: FirCallableSymbol,
+        symbol: FirCallableSymbol<FirNamedFunction>,
         name: Name,
         receiverTypeRef: FirTypeRef?,
         returnTypeRef: FirTypeRef
-    ) : super(session, psi, name, receiverTypeRef, returnTypeRef) {
-        this.symbol = symbol
-        symbol.bind(this)
-    }
+    ) : super(session, psi, symbol, name, receiverTypeRef, returnTypeRef)
 
     constructor(
         session: FirSession,
         psi: PsiElement?,
-        symbol: FirFunctionSymbol,
+        symbol: FirNamedFunctionSymbol,
         name: Name,
         visibility: Visibility,
         modality: Modality?,
@@ -55,18 +50,10 @@ open class FirMemberFunctionImpl : FirAbstractCallableMember, FirNamedFunction, 
         receiverTypeRef: FirTypeRef?,
         returnTypeRef: FirTypeRef
     ) : super(
-        session, psi, name, visibility, modality,
-        isExpect, isActual, isOverride, receiverTypeRef, returnTypeRef
-    ) {
-        status.isOperator = isOperator
-        status.isInfix = isInfix
-        status.isInline = isInline
-        status.isTailRec = isTailRec
-        status.isExternal = isExternal
-        status.isSuspend = isSuspend
-        this.symbol = symbol
-        symbol.bind(this)
-    }
+        session, psi, symbol, name, visibility, modality,
+        isExpect, isActual, isOverride, isOperator, isInfix, isInline, isTailRec, isExternal, isSuspend,
+        receiverTypeRef, returnTypeRef
+    )
 
     override val valueParameters = mutableListOf<FirValueParameter>()
 
@@ -76,6 +63,6 @@ open class FirMemberFunctionImpl : FirAbstractCallableMember, FirNamedFunction, 
         valueParameters.transformInplace(transformer, data)
         body = body?.transformSingle(transformer, data)
 
-        return super<FirAbstractCallableMember>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

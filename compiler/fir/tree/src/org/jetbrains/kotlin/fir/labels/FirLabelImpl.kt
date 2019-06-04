@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.labels
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirAbstractElement
 import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.FirSession
 
@@ -14,4 +13,4 @@ class FirLabelImpl(
     session: FirSession,
     psi: PsiElement?,
     override val name: String
-) : FirAbstractElement(session, psi), FirLabel
+) : FirLabel(session, psi)

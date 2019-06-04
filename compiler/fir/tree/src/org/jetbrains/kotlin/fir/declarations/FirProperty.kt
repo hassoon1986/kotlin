@@ -5,30 +5,46 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.BaseTransformedType
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
-import org.jetbrains.kotlin.fir.expressions.FirVariable
+import org.jetbrains.kotlin.fir.expressions.FirExpression
+import org.jetbrains.kotlin.fir.symbols.FirSymbolOwner
+import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.name.Name
 
-// May be should not inherit FirVariable
-@BaseTransformedType
-interface FirProperty : @VisitedSupertype FirDeclaration, FirCallableMemberDeclaration, FirVariable, FirMemberDeclaration {
+abstract class FirProperty(
+    session: FirSession,
+    psi: PsiElement?,
+    name: Name,
+    visibility: Visibility,
+    modality: Modality?,
+    isExpect: Boolean,
+    isActual: Boolean,
+    isOverride: Boolean,
+    receiverTypeRef: FirTypeRef?,
+    returnTypeRef: FirTypeRef
+) : @VisitedSupertype FirCallableMemberDeclaration<FirProperty>(
+    session, psi, name, visibility, modality, isExpect, isActual, isOverride, receiverTypeRef, returnTypeRef
+), FirValVarOwner, FirDelegateOwner, FirSymbolOwner<FirProperty> {
     val isConst: Boolean get() = status.isConst
 
     val isLateInit: Boolean get() = status.isLateInit
 
-    override val isOverride: Boolean get() = status.isOverride
-
     // Should it be nullable or have some default?
-    val getter: FirPropertyAccessor
+    abstract val getter: FirPropertyAccessor
 
-    val setter: FirPropertyAccessor?
+    abstract val setter: FirPropertyAccessor?
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitProperty(this, data)
 
     override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        super<FirCallableMemberDeclaration>.acceptChildren(visitor, data)
+        super.acceptChildren(visitor, data)
         initializer?.accept(visitor, data)
         delegate?.accept(visitor, data)
         getter.accept(visitor, data)

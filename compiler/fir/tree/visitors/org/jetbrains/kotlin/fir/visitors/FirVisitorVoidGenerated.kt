@@ -20,102 +20,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitElement(catch, null)
     }
 
-    open fun visitDeclaration(declaration: FirDeclaration) {
-        visitElement(declaration, null)
-    }
-
-    open fun visitCallableDeclaration(callableDeclaration: FirCallableDeclaration) {
-        visitDeclaration(callableDeclaration, null)
-    }
-
-    open fun visitCallableMemberDeclaration(callableMemberDeclaration: FirCallableMemberDeclaration) {
-        visitDeclaration(callableMemberDeclaration, null)
-    }
-
-    open fun visitDeclarationWithBody(declarationWithBody: FirDeclarationWithBody) {
-        visitDeclaration(declarationWithBody, null)
-    }
-
-    open fun visitAnonymousInitializer(anonymousInitializer: FirAnonymousInitializer) {
-        visitDeclarationWithBody(anonymousInitializer, null)
-    }
-
-    open fun visitFunction(function: FirFunction) {
-        visitDeclarationWithBody(function, null)
-    }
-
-    open fun visitAnonymousFunction(anonymousFunction: FirAnonymousFunction) {
-        visitFunction(anonymousFunction, null)
-    }
-
-    open fun visitConstructor(constructor: FirConstructor) {
-        visitFunction(constructor, null)
-    }
-
-    open fun visitModifiableFunction(modifiableFunction: FirModifiableFunction) {
-        visitFunction(modifiableFunction, null)
-    }
-
-    open fun visitNamedFunction(namedFunction: FirNamedFunction) {
-        visitFunction(namedFunction, null)
-    }
-
-    open fun visitPropertyAccessor(propertyAccessor: FirPropertyAccessor) {
-        visitFunction(propertyAccessor, null)
-    }
-
-    open fun visitErrorDeclaration(errorDeclaration: FirErrorDeclaration) {
-        visitDeclaration(errorDeclaration, null)
-    }
-
-    open fun visitField(field: FirField) {
-        visitDeclaration(field, null)
-    }
-
-    open fun visitNamedDeclaration(namedDeclaration: FirNamedDeclaration) {
-        visitDeclaration(namedDeclaration, null)
-    }
-
-    open fun visitMemberDeclaration(memberDeclaration: FirMemberDeclaration) {
-        visitNamedDeclaration(memberDeclaration, null)
-    }
-
-    open fun visitClassLikeDeclaration(classLikeDeclaration: FirClassLikeDeclaration) {
-        visitMemberDeclaration(classLikeDeclaration, null)
-    }
-
-    open fun visitRegularClass(regularClass: FirRegularClass) {
-        visitClassLikeDeclaration(regularClass, null)
-    }
-
-    open fun visitEnumEntry(enumEntry: FirEnumEntry) {
-        visitRegularClass(enumEntry, null)
-    }
-
-    open fun visitTypeAlias(typeAlias: FirTypeAlias) {
-        visitClassLikeDeclaration(typeAlias, null)
-    }
-
-    open fun visitTypeParameter(typeParameter: FirTypeParameter) {
-        visitNamedDeclaration(typeParameter, null)
-    }
-
-    open fun visitProperty(property: FirProperty) {
-        visitDeclaration(property, null)
-    }
-
-    open fun visitTypedDeclaration(typedDeclaration: FirTypedDeclaration) {
-        visitDeclaration(typedDeclaration, null)
-    }
-
-    open fun visitValueParameter(valueParameter: FirValueParameter) {
-        visitDeclaration(valueParameter, null)
-    }
-
-    open fun visitVariable(variable: FirVariable) {
-        visitDeclaration(variable, null)
-    }
-
     open fun visitDeclarationStatus(declarationStatus: FirDeclarationStatus) {
         visitElement(declarationStatus, null)
     }
@@ -168,52 +72,168 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitElement(statement, null)
     }
 
-    open fun visitClass(klass: FirClass) {
-        visitStatement(klass, null)
+    open fun visitDeclaration(declaration: FirDeclaration) {
+        visitStatement(declaration, null)
     }
 
-    open fun visitAnonymousObject(anonymousObject: FirAnonymousObject) {
-        visitClass(anonymousObject, null)
+    open fun visitAbstractFunction(abstractFunction: FirAbstractFunction) {
+        visitDeclaration(abstractFunction, null)
     }
 
-    open fun visitModifiableClass(modifiableClass: FirModifiableClass) {
-        visitClass(modifiableClass, null)
+    open fun visitDeclarationWithBody(declarationWithBody: FirDeclarationWithBody) {
+        visitDeclaration(declarationWithBody, null)
     }
 
-    open fun visitErrorStatement(errorStatement: FirErrorStatement) {
-        visitStatement(errorStatement, null)
+    open fun visitAnonymousInitializer(anonymousInitializer: FirAnonymousInitializer) {
+        visitDeclarationWithBody(anonymousInitializer, null)
+    }
+
+    open fun visitPropertyAccessor(propertyAccessor: FirPropertyAccessor) {
+        visitDeclarationWithBody(propertyAccessor, null)
+    }
+
+    open fun visitDefaultPropertyAccessor(defaultPropertyAccessor: FirDefaultPropertyAccessor) {
+        visitPropertyAccessor(defaultPropertyAccessor, null)
+    }
+
+    open fun visitErrorDeclaration(errorDeclaration: FirErrorDeclaration) {
+        visitDeclaration(errorDeclaration, null)
+    }
+
+    open fun visitNamedDeclaration(namedDeclaration: FirNamedDeclaration) {
+        visitDeclaration(namedDeclaration, null)
+    }
+
+    open fun visitMemberDeclaration(memberDeclaration: FirMemberDeclaration) {
+        visitNamedDeclaration(memberDeclaration, null)
+    }
+
+    open fun <F : FirCallableMemberDeclaration<F>> visitCallableMemberDeclaration(callableMemberDeclaration: FirCallableMemberDeclaration<F>) {
+        visitMemberDeclaration(callableMemberDeclaration, null)
+    }
+
+    open fun visitConstructor(constructor: FirConstructor) {
+        visitCallableMemberDeclaration(constructor, null)
+    }
+
+    open fun visitField(field: FirField) {
+        visitCallableMemberDeclaration(field, null)
+    }
+
+    open fun visitNamedFunction(namedFunction: FirNamedFunction) {
+        visitCallableMemberDeclaration(namedFunction, null)
+    }
+
+    open fun visitProperty(property: FirProperty) {
+        visitCallableMemberDeclaration(property, null)
+    }
+
+    open fun <F : FirClassLikeDeclaration<F>> visitClassLikeDeclaration(classLikeDeclaration: FirClassLikeDeclaration<F>) {
+        visitMemberDeclaration(classLikeDeclaration, null)
+    }
+
+    open fun visitRegularClass(regularClass: FirRegularClass) {
+        visitClassLikeDeclaration(regularClass, null)
+    }
+
+    open fun visitEnumEntry(enumEntry: FirEnumEntry) {
+        visitRegularClass(enumEntry, null)
+    }
+
+    open fun visitTypeAlias(typeAlias: FirTypeAlias) {
+        visitClassLikeDeclaration(typeAlias, null)
+    }
+
+    open fun visitTypeParameter(typeParameter: FirTypeParameter) {
+        visitNamedDeclaration(typeParameter, null)
+    }
+
+    open fun visitVariable(variable: FirVariable) {
+        visitNamedDeclaration(variable, null)
+    }
+
+    open fun visitValueParameter(valueParameter: FirValueParameter) {
+        visitVariable(valueParameter, null)
     }
 
     open fun visitExpression(expression: FirExpression) {
         visitStatement(expression, null)
     }
 
+    open fun visitAbstractExpression(abstractExpression: FirAbstractExpression) {
+        visitExpression(abstractExpression, null)
+    }
+
     open fun visitBlock(block: FirBlock) {
-        visitExpression(block, null)
+        visitAbstractExpression(block, null)
+    }
+
+    open fun visitClassReferenceExpression(classReferenceExpression: FirClassReferenceExpression) {
+        visitAbstractExpression(classReferenceExpression, null)
+    }
+
+    open fun <T> visitConstExpression(constExpression: FirConstExpression<T>) {
+        visitAbstractExpression(constExpression, null)
+    }
+
+    open fun visitErrorExpression(errorExpression: FirErrorExpression) {
+        visitAbstractExpression(errorExpression, null)
+    }
+
+    open fun visitQualifiedAccessExpression(qualifiedAccessExpression: FirQualifiedAccessExpression) {
+        visitAbstractExpression(qualifiedAccessExpression, null)
+    }
+
+    open fun visitCallableReferenceAccess(callableReferenceAccess: FirCallableReferenceAccess) {
+        visitQualifiedAccessExpression(callableReferenceAccess, null)
+    }
+
+    open fun visitResolvedQualifier(resolvedQualifier: FirResolvedQualifier) {
+        visitAbstractExpression(resolvedQualifier, null)
+    }
+
+    open fun visitTryExpression(tryExpression: FirTryExpression) {
+        visitAbstractExpression(tryExpression, null)
+    }
+
+    open fun visitWhenExpression(whenExpression: FirWhenExpression) {
+        visitAbstractExpression(whenExpression, null)
+    }
+
+    open fun visitWhenSubjectExpression(whenSubjectExpression: FirWhenSubjectExpression) {
+        visitAbstractExpression(whenSubjectExpression, null)
+    }
+
+    open fun visitAnonymousFunction(anonymousFunction: FirAnonymousFunction) {
+        visitExpression(anonymousFunction, null)
+    }
+
+    open fun visitAnonymousObject(anonymousObject: FirAnonymousObject) {
+        visitExpression(anonymousObject, null)
     }
 
     open fun visitCall(call: FirCall) {
         visitExpression(call, null)
     }
 
+    open fun visitAbstractCall(abstractCall: FirAbstractCall) {
+        visitCall(abstractCall, null)
+    }
+
+    open fun visitAbstractCallWithImplicitTypeRef(abstractCallWithImplicitTypeRef: FirAbstractCallWithImplicitTypeRef) {
+        visitAbstractCall(abstractCallWithImplicitTypeRef, null)
+    }
+
     open fun visitAnnotationCall(annotationCall: FirAnnotationCall) {
-        visitCall(annotationCall, null)
+        visitAbstractCallWithImplicitTypeRef(annotationCall, null)
     }
 
     open fun visitArrayOfCall(arrayOfCall: FirArrayOfCall) {
-        visitCall(arrayOfCall, null)
-    }
-
-    open fun visitArraySetCall(arraySetCall: FirArraySetCall) {
-        visitCall(arraySetCall, null)
-    }
-
-    open fun visitDelegatedConstructorCall(delegatedConstructorCall: FirDelegatedConstructorCall) {
-        visitCall(delegatedConstructorCall, null)
+        visitAbstractCallWithImplicitTypeRef(arrayOfCall, null)
     }
 
     open fun visitFunctionCall(functionCall: FirFunctionCall) {
-        visitCall(functionCall, null)
+        visitAbstractCallWithImplicitTypeRef(functionCall, null)
     }
 
     open fun visitComponentCall(componentCall: FirComponentCall) {
@@ -221,71 +241,59 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
     }
 
     open fun visitGetClassCall(getClassCall: FirGetClassCall) {
-        visitCall(getClassCall, null)
-    }
-
-    open fun visitOperatorCall(operatorCall: FirOperatorCall) {
-        visitCall(operatorCall, null)
-    }
-
-    open fun visitTypeOperatorCall(typeOperatorCall: FirTypeOperatorCall) {
-        visitOperatorCall(typeOperatorCall, null)
-    }
-
-    open fun visitStringConcatenationCall(stringConcatenationCall: FirStringConcatenationCall) {
-        visitCall(stringConcatenationCall, null)
+        visitAbstractCallWithImplicitTypeRef(getClassCall, null)
     }
 
     open fun visitUncheckedNotNullCast(uncheckedNotNullCast: FirUncheckedNotNullCast) {
-        visitCall(uncheckedNotNullCast, null)
+        visitAbstractCallWithImplicitTypeRef(uncheckedNotNullCast, null)
     }
 
-    open fun visitClassReferenceExpression(classReferenceExpression: FirClassReferenceExpression) {
-        visitExpression(classReferenceExpression, null)
+    open fun visitDelegatedConstructorCall(delegatedConstructorCall: FirDelegatedConstructorCall) {
+        visitAbstractCall(delegatedConstructorCall, null)
     }
 
-    open fun <T> visitConstExpression(constExpression: FirConstExpression<T>) {
-        visitExpression(constExpression, null)
+    open fun visitOperatorCall(operatorCall: FirOperatorCall) {
+        visitAbstractCall(operatorCall, null)
     }
 
-    open fun visitErrorExpression(errorExpression: FirErrorExpression) {
-        visitExpression(errorExpression, null)
+    open fun visitAbstractOperationBasedCall(abstractOperationBasedCall: FirAbstractOperationBasedCall) {
+        visitOperatorCall(abstractOperationBasedCall, null)
+    }
+
+    open fun visitTypeOperatorCall(typeOperatorCall: FirTypeOperatorCall) {
+        visitAbstractOperationBasedCall(typeOperatorCall, null)
+    }
+
+    open fun visitStringConcatenationCall(stringConcatenationCall: FirStringConcatenationCall) {
+        visitAbstractCall(stringConcatenationCall, null)
+    }
+
+    open fun visitArraySetCall(arraySetCall: FirArraySetCall) {
+        visitCall(arraySetCall, null)
     }
 
     open fun <E : FirTargetElement> visitJump(jump: FirJump<E>) {
         visitExpression(jump, null)
     }
 
+    open fun visitAbstractLoopJump(abstractLoopJump: FirAbstractLoopJump) {
+        visitJump(abstractLoopJump, null)
+    }
+
     open fun visitBreakExpression(breakExpression: FirBreakExpression) {
-        visitJump(breakExpression, null)
+        visitAbstractLoopJump(breakExpression, null)
     }
 
     open fun visitContinueExpression(continueExpression: FirContinueExpression) {
-        visitJump(continueExpression, null)
+        visitAbstractLoopJump(continueExpression, null)
     }
 
     open fun visitReturnExpression(returnExpression: FirReturnExpression) {
         visitJump(returnExpression, null)
     }
 
-    open fun visitResolvedQualifier(resolvedQualifier: FirResolvedQualifier) {
-        visitExpression(resolvedQualifier, null)
-    }
-
     open fun visitThrowExpression(throwExpression: FirThrowExpression) {
         visitExpression(throwExpression, null)
-    }
-
-    open fun visitTryExpression(tryExpression: FirTryExpression) {
-        visitExpression(tryExpression, null)
-    }
-
-    open fun visitWhenExpression(whenExpression: FirWhenExpression) {
-        visitExpression(whenExpression, null)
-    }
-
-    open fun visitWhenSubjectExpression(whenSubjectExpression: FirWhenSubjectExpression) {
-        visitExpression(whenSubjectExpression, null)
     }
 
     open fun visitWrappedArgumentExpression(wrappedArgumentExpression: FirWrappedArgumentExpression) {
@@ -316,36 +324,8 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitLoop(whileLoop, null)
     }
 
-    open fun visitQualifiedAccess(qualifiedAccess: FirQualifiedAccess) {
-        visitStatement(qualifiedAccess, null)
-    }
-
-    open fun visitAssignment(assignment: FirAssignment) {
-        visitQualifiedAccess(assignment, null)
-    }
-
     open fun visitVariableAssignment(variableAssignment: FirVariableAssignment) {
-        visitAssignment(variableAssignment, null)
-    }
-
-    open fun visitModifiableQualifiedAccess(modifiableQualifiedAccess: FirModifiableQualifiedAccess) {
-        visitQualifiedAccess(modifiableQualifiedAccess, null)
-    }
-
-    open fun visitQualifiedAccessExpression(qualifiedAccessExpression: FirQualifiedAccessExpression) {
-        visitQualifiedAccess(qualifiedAccessExpression, null)
-    }
-
-    open fun visitCallableReferenceAccess(callableReferenceAccess: FirCallableReferenceAccess) {
-        visitQualifiedAccessExpression(callableReferenceAccess, null)
-    }
-
-    open fun visitTargetElement(targetElement: FirTargetElement) {
-        visitElement(targetElement, null)
-    }
-
-    open fun visitLabeledElement(labeledElement: FirLabeledElement) {
-        visitTargetElement(labeledElement, null)
+        visitStatement(variableAssignment, null)
     }
 
     open fun visitTypeProjection(typeProjection: FirTypeProjection) {
@@ -392,16 +372,36 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitTypeRefWithNullability(dynamicTypeRef, null)
     }
 
-    open fun visitFunctionTypeRef(functionTypeRef: FirFunctionTypeRef) {
-        visitTypeRefWithNullability(functionTypeRef, null)
-    }
-
     open fun visitUserTypeRef(userTypeRef: FirUserTypeRef) {
         visitTypeRefWithNullability(userTypeRef, null)
     }
 
     open fun visitWhenBranch(whenBranch: FirWhenBranch) {
         visitElement(whenBranch, null)
+    }
+
+    final override fun visitAbstractCall(abstractCall: FirAbstractCall, data: Nothing?) {
+        visitAbstractCall(abstractCall)
+    }
+
+    final override fun visitAbstractCallWithImplicitTypeRef(abstractCallWithImplicitTypeRef: FirAbstractCallWithImplicitTypeRef, data: Nothing?) {
+        visitAbstractCallWithImplicitTypeRef(abstractCallWithImplicitTypeRef)
+    }
+
+    final override fun visitAbstractExpression(abstractExpression: FirAbstractExpression, data: Nothing?) {
+        visitAbstractExpression(abstractExpression)
+    }
+
+    final override fun visitAbstractFunction(abstractFunction: FirAbstractFunction, data: Nothing?) {
+        visitAbstractFunction(abstractFunction)
+    }
+
+    final override fun visitAbstractLoopJump(abstractLoopJump: FirAbstractLoopJump, data: Nothing?) {
+        visitAbstractLoopJump(abstractLoopJump)
+    }
+
+    final override fun visitAbstractOperationBasedCall(abstractOperationBasedCall: FirAbstractOperationBasedCall, data: Nothing?) {
+        visitAbstractOperationBasedCall(abstractOperationBasedCall)
     }
 
     final override fun visitAnnotationCall(annotationCall: FirAnnotationCall, data: Nothing?) {
@@ -428,10 +428,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitArraySetCall(arraySetCall)
     }
 
-    final override fun visitAssignment(assignment: FirAssignment, data: Nothing?) {
-        visitAssignment(assignment)
-    }
-
     final override fun visitBlock(block: FirBlock, data: Nothing?) {
         visitBlock(block)
     }
@@ -444,11 +440,7 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitCall(call)
     }
 
-    final override fun visitCallableDeclaration(callableDeclaration: FirCallableDeclaration, data: Nothing?) {
-        visitCallableDeclaration(callableDeclaration)
-    }
-
-    final override fun visitCallableMemberDeclaration(callableMemberDeclaration: FirCallableMemberDeclaration, data: Nothing?) {
+    final override fun <F : FirCallableMemberDeclaration<F>> visitCallableMemberDeclaration(callableMemberDeclaration: FirCallableMemberDeclaration<F>, data: Nothing?) {
         visitCallableMemberDeclaration(callableMemberDeclaration)
     }
 
@@ -460,11 +452,7 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitCatch(catch)
     }
 
-    final override fun visitClass(klass: FirClass, data: Nothing?) {
-        visitClass(klass)
-    }
-
-    final override fun visitClassLikeDeclaration(classLikeDeclaration: FirClassLikeDeclaration, data: Nothing?) {
+    final override fun <F : FirClassLikeDeclaration<F>> visitClassLikeDeclaration(classLikeDeclaration: FirClassLikeDeclaration<F>, data: Nothing?) {
         visitClassLikeDeclaration(classLikeDeclaration)
     }
 
@@ -500,6 +488,10 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitDeclarationWithBody(declarationWithBody)
     }
 
+    final override fun visitDefaultPropertyAccessor(defaultPropertyAccessor: FirDefaultPropertyAccessor, data: Nothing?) {
+        visitDefaultPropertyAccessor(defaultPropertyAccessor)
+    }
+
     final override fun visitDelegatedConstructorCall(delegatedConstructorCall: FirDelegatedConstructorCall, data: Nothing?) {
         visitDelegatedConstructorCall(delegatedConstructorCall)
     }
@@ -528,10 +520,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitErrorExpression(errorExpression)
     }
 
-    final override fun visitErrorStatement(errorStatement: FirErrorStatement, data: Nothing?) {
-        visitErrorStatement(errorStatement)
-    }
-
     final override fun visitErrorTypeRef(errorTypeRef: FirErrorTypeRef, data: Nothing?) {
         visitErrorTypeRef(errorTypeRef)
     }
@@ -548,16 +536,8 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitFile(file)
     }
 
-    final override fun visitFunction(function: FirFunction, data: Nothing?) {
-        visitFunction(function)
-    }
-
     final override fun visitFunctionCall(functionCall: FirFunctionCall, data: Nothing?) {
         visitFunctionCall(functionCall)
-    }
-
-    final override fun visitFunctionTypeRef(functionTypeRef: FirFunctionTypeRef, data: Nothing?) {
-        visitFunctionTypeRef(functionTypeRef)
     }
 
     final override fun visitGetClassCall(getClassCall: FirGetClassCall, data: Nothing?) {
@@ -580,10 +560,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitLabel(label)
     }
 
-    final override fun visitLabeledElement(labeledElement: FirLabeledElement, data: Nothing?) {
-        visitLabeledElement(labeledElement)
-    }
-
     final override fun visitLambdaArgumentExpression(lambdaArgumentExpression: FirLambdaArgumentExpression, data: Nothing?) {
         visitLambdaArgumentExpression(lambdaArgumentExpression)
     }
@@ -594,18 +570,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
 
     final override fun visitMemberDeclaration(memberDeclaration: FirMemberDeclaration, data: Nothing?) {
         visitMemberDeclaration(memberDeclaration)
-    }
-
-    final override fun visitModifiableClass(modifiableClass: FirModifiableClass, data: Nothing?) {
-        visitModifiableClass(modifiableClass)
-    }
-
-    final override fun visitModifiableFunction(modifiableFunction: FirModifiableFunction, data: Nothing?) {
-        visitModifiableFunction(modifiableFunction)
-    }
-
-    final override fun visitModifiableQualifiedAccess(modifiableQualifiedAccess: FirModifiableQualifiedAccess, data: Nothing?) {
-        visitModifiableQualifiedAccess(modifiableQualifiedAccess)
     }
 
     final override fun visitNamedArgumentExpression(namedArgumentExpression: FirNamedArgumentExpression, data: Nothing?) {
@@ -638,10 +602,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
 
     final override fun visitPropertyAccessor(propertyAccessor: FirPropertyAccessor, data: Nothing?) {
         visitPropertyAccessor(propertyAccessor)
-    }
-
-    final override fun visitQualifiedAccess(qualifiedAccess: FirQualifiedAccess, data: Nothing?) {
-        visitQualifiedAccess(qualifiedAccess)
     }
 
     final override fun visitQualifiedAccessExpression(qualifiedAccessExpression: FirQualifiedAccessExpression, data: Nothing?) {
@@ -704,10 +664,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitSuperReference(superReference)
     }
 
-    final override fun visitTargetElement(targetElement: FirTargetElement, data: Nothing?) {
-        visitTargetElement(targetElement)
-    }
-
     final override fun visitThisReference(thisReference: FirThisReference, data: Nothing?) {
         visitThisReference(thisReference)
     }
@@ -746,10 +702,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
 
     final override fun visitTypeRefWithNullability(typeRefWithNullability: FirTypeRefWithNullability, data: Nothing?) {
         visitTypeRefWithNullability(typeRefWithNullability)
-    }
-
-    final override fun visitTypedDeclaration(typedDeclaration: FirTypedDeclaration, data: Nothing?) {
-        visitTypedDeclaration(typedDeclaration)
     }
 
     final override fun visitUncheckedNotNullCast(uncheckedNotNullCast: FirUncheckedNotNullCast, data: Nothing?) {

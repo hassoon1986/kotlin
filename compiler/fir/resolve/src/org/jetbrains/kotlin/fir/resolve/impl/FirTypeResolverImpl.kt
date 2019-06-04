@@ -93,7 +93,7 @@ class FirTypeResolverImpl(private val session: FirSession) : FirTypeResolver {
         return ConeClassTypeImpl(
             resolveBuiltInQualified(KotlinBuiltIns.getFunctionClassId(typeRef.parametersCount), session).toLookupTag(),
             parameters.toTypedArray(),
-            typeRef.isMarkedNullable
+            (typeRef as? FirTypeRefWithNullability)?.isMarkedNullable == true
         )
     }
 

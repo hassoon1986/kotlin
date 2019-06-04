@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.fir.references
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirAbstractElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirThisReference
 
@@ -14,4 +13,4 @@ class FirExplicitThisReference(
     session: FirSession,
     psi: PsiElement?,
     override val labelName: String?
-) : FirAbstractElement(session, psi), FirThisReference
+) : FirThisReference(session, psi)

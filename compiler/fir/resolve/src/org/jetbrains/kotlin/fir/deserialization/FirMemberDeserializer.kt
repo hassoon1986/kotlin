@@ -13,10 +13,7 @@ import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.impl.FirExpressionStub
 import org.jetbrains.kotlin.fir.resolve.transformers.firUnsafe
 import org.jetbrains.kotlin.fir.symbols.CallableId
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirTypeAliasSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirTypeParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
@@ -200,7 +197,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
             c.versionRequirementTable
 
         val callableName = c.nameResolver.getName(proto.name)
-        val symbol = FirFunctionSymbol(CallableId(c.packageFqName, c.relativeClassName, callableName))
+        val symbol = FirNamedFunctionSymbol(CallableId(c.packageFqName, c.relativeClassName, callableName))
         val local = c.childContext(proto.typeParameterList)
 
         // TODO: support contracts
@@ -232,7 +229,7 @@ class FirMemberDeserializer(private val c: FirDeserializationContext) {
     fun loadConstructor(proto: ProtoBuf.Constructor, klass: FirRegularClass): FirConstructor {
         val flags = proto.flags
         val relativeClassName = c.relativeClassName!!
-        val symbol = FirFunctionSymbol(CallableId(c.packageFqName, relativeClassName, relativeClassName.shortName()))
+        val symbol = FirConstructorSymbol(CallableId(c.packageFqName, relativeClassName, relativeClassName.shortName()))
         val local = c.childContext(emptyList())
         val isPrimary = !Flags.IS_SECONDARY.get(flags)
 

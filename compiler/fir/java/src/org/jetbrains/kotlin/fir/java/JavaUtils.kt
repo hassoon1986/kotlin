@@ -184,7 +184,7 @@ internal fun JavaAnnotation.toFirAnnotationCall(
     }
 }
 
-internal fun FirAbstractAnnotatedElement.addAnnotationsFrom(
+internal fun FirMutableAnnotationContainer.addAnnotationsFrom(
     session: FirSession, javaAnnotationOwner: JavaAnnotationOwner, javaTypeParameterStack: JavaTypeParameterStack
 ) {
     for (annotation in javaAnnotationOwner.annotations) {

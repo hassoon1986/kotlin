@@ -5,13 +5,10 @@
 
 package org.jetbrains.kotlin.fir.types.impl
 
-import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 
-object FirTypePlaceholderProjection : FirTypeProjection {
-    override val psi: PsiElement?
-        get() = null // TODO
-    override val session: FirSession
-        get() = error("ahahahhahah")
-}
+object FirTypePlaceholderProjection : FirTypeProjection(
+    FirTypingStubSession,
+    null
+)
+

@@ -5,8 +5,11 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.fir.BaseTransformedType
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.expressions.impl.FirAbstractCallWithImplicitTypeRef
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
@@ -14,12 +17,14 @@ import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.FqName
 
-@BaseTransformedType
-interface FirAnnotationCall : FirCall {
-    val annotationTypeRef: FirTypeRef
+abstract class FirAnnotationCall(
+    session: FirSession,
+    psi: PsiElement?
+) : FirAbstractCallWithImplicitTypeRef(session, psi) {
+    abstract val annotationTypeRef: FirTypeRef
 
     // May be should be not-null (with correct default target)
-    val useSiteTarget: AnnotationUseSiteTarget?
+    abstract val useSiteTarget: AnnotationUseSiteTarget?
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitAnnotationCall(this, data)

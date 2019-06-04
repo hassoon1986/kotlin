@@ -5,11 +5,6 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
-import org.jetbrains.kotlin.fir.visitors.FirVisitor
-
-interface FirErrorStatement : FirStatement {
+interface FirErrorStatement {
     val reason: String
-
-    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
-        visitor.visitErrorStatement(this, data)
 }

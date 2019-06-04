@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.fir.declarations.impl
 
-import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirSession
@@ -13,9 +12,9 @@ import org.jetbrains.kotlin.fir.declarations.FirResolvedDeclarationStatus
 
 class FirResolvedDeclarationStatusImpl(
     session: FirSession,
-    visibility: Visibility,
-    modality: Modality
-) : FirDeclarationStatusImpl(session, visibility, modality), FirResolvedDeclarationStatus {
+    override val visibility: Visibility,
+    override val modality: Modality
+) : FirResolvedDeclarationStatus(session, null) {
 
     internal constructor(
         session: FirSession,
@@ -25,10 +24,4 @@ class FirResolvedDeclarationStatusImpl(
     ) : this(session, visibility, modality) {
         this.flags = flags
     }
-
-    override val visibility: Visibility
-        get() = super.visibility
-
-    override val modality: Modality
-        get() = super.modality!!
 }

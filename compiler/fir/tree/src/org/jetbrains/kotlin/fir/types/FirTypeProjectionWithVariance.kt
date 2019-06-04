@@ -5,13 +5,18 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.types.Variance
 
-interface FirTypeProjectionWithVariance : FirTypeProjection {
-    val variance: Variance
+abstract class FirTypeProjectionWithVariance(
+    session: FirSession,
+    psi: PsiElement?
+) : FirTypeProjection(session, psi) {
+    abstract val variance: Variance
 
-    val typeRef: FirTypeRef
+    abstract val typeRef: FirTypeRef
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitTypeProjectionWithVariance(this, data)

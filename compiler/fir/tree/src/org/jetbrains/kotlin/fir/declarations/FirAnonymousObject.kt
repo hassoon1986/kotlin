@@ -5,12 +5,17 @@
 
 package org.jetbrains.kotlin.fir.declarations
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.VisitedSupertype
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirAnonymousObject : @VisitedSupertype FirClass, FirExpression {
+abstract class FirAnonymousObject(
+    session: FirSession,
+    psi: PsiElement?
+) : @VisitedSupertype FirExpression(session, psi), FirClass {
     override val classKind: ClassKind
         get() = ClassKind.OBJECT
 

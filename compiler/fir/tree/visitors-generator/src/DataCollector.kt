@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.fir.visitors.generator
 
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
@@ -13,7 +14,7 @@ class DataCollector {
 
     class NameWithTypeParameters private constructor(
         val name: String,
-        val typeParameters: List<String>,
+        private val typeParameters: List<String>,
         private val typeParameterBounds: Map<String, String>
     ) : Comparable<NameWithTypeParameters> {
 
@@ -88,7 +89,7 @@ class DataCollector {
                     return
                 }
                 val classNameWithParameters = NameWithTypeParameters(className, klass.typeParameterList?.text ?: "")
-                if (klass.isInterface()) {
+                if (klass.isInterface() || klass.hasModifier(KtTokens.ABSTRACT_KEYWORD)) {
                     packagePerClass[classNameWithParameters] = file.packageFqName
                     val isBaseTT = klass.annotationEntries.any {
                         it.shortName?.asString() == BASE_TRANSFORMED_TYPE_ANNOTATION_NAME

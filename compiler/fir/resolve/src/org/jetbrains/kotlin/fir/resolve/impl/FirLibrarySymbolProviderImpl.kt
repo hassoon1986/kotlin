@@ -204,7 +204,7 @@ class FirLibrarySymbolProviderImpl(val session: FirSession) : FirSymbolProvider 
     }
 
     override fun getAllCallableNamesInClass(classId: ClassId): Set<Name> {
-        return getClassDeclarations(classId).filterIsInstance<FirCallableMemberDeclaration>().mapTo(mutableSetOf()) { it.name }
+        return getClassDeclarations(classId).filterIsInstance<FirCallableMemberDeclaration<*>>().mapTo(mutableSetOf()) { it.name }
     }
 
     private fun getClassDeclarations(classId: ClassId): List<FirDeclaration> {

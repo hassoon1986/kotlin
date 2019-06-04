@@ -5,10 +5,16 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.expressions.impl.FirAbstractExpression
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirErrorExpression : FirExpression {
-    val reason: String
+abstract class FirErrorExpression(
+    session: FirSession,
+    psi: PsiElement?
+) : FirAbstractExpression(session, psi) {
+    abstract val reason: String
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
         return visitor.visitErrorExpression(this, data)

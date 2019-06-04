@@ -5,17 +5,7 @@
 
 package org.jetbrains.kotlin.fir
 
-import org.jetbrains.kotlin.fir.visitors.FirVisitor
-
 // Target element which may have label
 interface FirLabeledElement : FirTargetElement {
     val label: FirLabel? get() = null
-
-    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
-        visitor.visitLabeledElement(this, data)
-
-    override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        label?.accept(visitor, data)
-    }
-
 }

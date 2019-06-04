@@ -5,10 +5,15 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirErrorTypeRef : FirResolvedTypeRef {
-    val reason: String
+abstract class FirErrorTypeRef(
+    session: FirSession,
+    psi: PsiElement?
+) : FirResolvedTypeRef(session, psi) {
+    abstract val reason: String
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitErrorTypeRef(this, data)

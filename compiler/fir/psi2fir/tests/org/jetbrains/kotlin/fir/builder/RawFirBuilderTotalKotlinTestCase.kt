@@ -72,7 +72,7 @@ class RawFirBuilderTotalKotlinTestCase : AbstractRawFirBuilderTestCase() {
                         errorExpression.psi?.let { println(it) }
                     }
 
-                    override fun visitQualifiedAccess(qualifiedAccess: FirQualifiedAccess) {
+                    private fun visitQualifiedAccess(qualifiedAccess: FirQualifiedAccess) {
                         val calleeReference = qualifiedAccess.calleeReference
                         if (calleeReference is FirErrorNamedReference) {
                             errorReferences++
@@ -80,7 +80,6 @@ class RawFirBuilderTotalKotlinTestCase : AbstractRawFirBuilderTestCase() {
                         } else {
                             normalReferences++
                         }
-                        super.visitQualifiedAccess(qualifiedAccess)
                     }
 
                     override fun visitExpression(expression: FirExpression) {
@@ -93,11 +92,17 @@ class RawFirBuilderTotalKotlinTestCase : AbstractRawFirBuilderTestCase() {
                             }
                             else -> normalExpressions++
                         }
+                        if (expression is FirQualifiedAccess) {
+                            visitQualifiedAccess(expression)
+                        }
                         expression.acceptChildren(this)
                     }
 
                     override fun visitStatement(statement: FirStatement) {
                         normalStatements++
+                        if (statement is FirQualifiedAccess) {
+                            visitQualifiedAccess(statement)
+                        }
                         statement.acceptChildren(this)
                     }
 

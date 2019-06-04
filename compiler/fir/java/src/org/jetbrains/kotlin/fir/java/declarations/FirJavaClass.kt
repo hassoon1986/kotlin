@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirRegularClass
-import org.jetbrains.kotlin.fir.declarations.impl.FirAbstractMemberDeclaration
 import org.jetbrains.kotlin.fir.declarations.impl.FirModifiableClass
 import org.jetbrains.kotlin.fir.java.JavaTypeParameterStack
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
@@ -28,11 +27,11 @@ class FirJavaClass internal constructor(
     isTopLevel: Boolean,
     isStatic: Boolean,
     internal val javaTypeParameterStack: JavaTypeParameterStack
-) : FirAbstractMemberDeclaration(
+) : FirRegularClass(
     session, psi = null, name = name,
     visibility = visibility, modality = modality,
     isExpect = false, isActual = false
-), FirRegularClass, FirModifiableClass {
+), FirModifiableClass {
     init {
         symbol.bind(this)
         status.isInner = !isTopLevel && !isStatic

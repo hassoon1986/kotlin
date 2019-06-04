@@ -358,14 +358,14 @@ class KotlinDeserializedJvmSymbolsProvider(
 
 
             }, null)
-            (symbol.fir as FirAbstractAnnotatedElement).annotations += annotations
+            (symbol.fir as FirMutableAnnotationContainer).annotations += annotations
         }
 
         return classesCache[classId]
 //        }
     }
 
-    private fun loadFunctionsByName(part: PackagePartsCacheData, name: Name): List<FirCallableSymbol> {
+    private fun loadFunctionsByName(part: PackagePartsCacheData, name: Name): List<FirCallableSymbol<*>> {
         val functionIds = part.topLevelFunctionNameIndex[name] ?: return emptyList()
         return functionIds.map { part.proto.getFunction(it) }
             .map {
@@ -375,7 +375,7 @@ class KotlinDeserializedJvmSymbolsProvider(
             }
     }
 
-    private fun loadPropertiesByName(part: PackagePartsCacheData, name: Name): List<FirCallableSymbol> {
+    private fun loadPropertiesByName(part: PackagePartsCacheData, name: Name): List<FirCallableSymbol<*>> {
         val propertyIds = part.topLevelPropertyNameIndex[name] ?: return emptyList()
         return propertyIds.map { part.proto.getProperty(it) }
             .map {

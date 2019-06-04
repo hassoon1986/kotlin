@@ -5,10 +5,8 @@
 
 package org.jetbrains.kotlin.fir.symbols
 
-import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.declarations.FirNamedDeclaration
 
-interface FirBasedSymbol<E> : ConeSymbol where E : FirElement, E : FirSymbolOwner<E> {
+interface FirBasedSymbol<E> : ConeSymbol where E : FirNamedDeclaration, E : FirSymbolOwner<E> {
     val fir: E
-
-    fun bind(e: E)
 }

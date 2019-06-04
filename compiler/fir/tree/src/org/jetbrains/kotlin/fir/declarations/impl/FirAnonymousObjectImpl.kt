@@ -15,12 +15,11 @@ import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.FirImplicitTypeRefImpl
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
-import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
 class FirAnonymousObjectImpl(
     session: FirSession,
     psi: PsiElement?
-) : FirAbstractAnnotatedDeclaration(session, psi), FirAnonymousObject, FirModifiableClass {
+) : FirAnonymousObject(session, psi), FirModifiableClass {
     override var typeRef: FirTypeRef = FirImplicitTypeRefImpl(session, null)
 
     override val superTypeRefs = mutableListOf<FirTypeRef>()
@@ -31,15 +30,11 @@ class FirAnonymousObjectImpl(
         typeRef = newTypeRef
     }
 
-    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R {
-        return super<FirAnonymousObject>.accept(visitor, data)
-    }
-
     override fun <D> transformChildren(transformer: FirTransformer<D>, data: D): FirElement {
         typeRef = typeRef.transformSingle(transformer, data)
         superTypeRefs.transformInplace(transformer, data)
         declarations.transformInplace(transformer, data)
 
-        return super<FirAbstractAnnotatedDeclaration>.transformChildren(transformer, data)
+        return super.transformChildren(transformer, data)
     }
 }

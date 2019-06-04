@@ -6,12 +6,12 @@
 package org.jetbrains.kotlin.fir.resolve.calls
 
 import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirMemberDeclaration
 import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
 import org.jetbrains.kotlin.fir.resolve.FirProvider
 import org.jetbrains.kotlin.fir.resolve.transformers.firSafeNullable
-import org.jetbrains.kotlin.fir.resolve.transformers.firUnsafe
 import org.jetbrains.kotlin.fir.service
 import org.jetbrains.kotlin.fir.symbols.ConeCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.ConeClassLikeSymbol
@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.load.java.JavaVisibilities
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind.*
-import java.lang.IllegalStateException
 
 
 abstract class ResolutionStage {
@@ -80,8 +79,8 @@ internal sealed class CheckReceivers : ResolutionStage() {
         }
 
         override fun Candidate.getReceiverValue(): ReceiverValue? {
-            val callableSymbol = symbol as? FirCallableSymbol ?: return null
-            val callable = callableSymbol.fir
+            val callableSymbol = symbol as? FirCallableSymbol<*> ?: return null
+            val callable = callableSymbol.fir as? FirCallableDeclaration<*> ?: return null
             val type = (callable.receiverTypeRef as FirResolvedTypeRef?)?.type ?: return null
             return object : ReceiverValue {
                 override val type: ConeKotlinType
@@ -136,8 +135,8 @@ internal sealed class CheckReceivers : ResolutionStage() {
 
 internal object MapArguments : ResolutionStage() {
     override suspend fun check(candidate: Candidate, sink: CheckerSink, callInfo: CallInfo) {
-        val symbol = candidate.symbol as? FirFunctionSymbol ?: return sink.reportApplicability(CandidateApplicability.HIDDEN)
-        val function = symbol.firUnsafe<FirFunction>()
+        val symbol = candidate.symbol as? FirFunctionSymbol<*> ?: return sink.reportApplicability(CandidateApplicability.HIDDEN)
+        val function = symbol.fir as FirFunction
         val processor = FirCallArgumentsProcessor(function, callInfo.arguments)
         val mappingResult = processor.process()
         candidate.argumentMapping = mappingResult.argumentMapping

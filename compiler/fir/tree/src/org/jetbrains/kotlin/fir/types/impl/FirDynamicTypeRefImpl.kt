@@ -13,4 +13,4 @@ class FirDynamicTypeRefImpl(
     session: FirSession,
     psi: PsiElement?,
     isNullable: Boolean
-) : FirAbstractAnnotatedTypeRef(session, psi, isNullable), FirDynamicTypeRef
+) : FirDynamicTypeRef(session, psi, isNullable)

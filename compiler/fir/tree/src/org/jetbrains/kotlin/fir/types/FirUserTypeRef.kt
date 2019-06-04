@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.fir.types
 
+import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.name.Name
 
@@ -12,8 +14,12 @@ interface FirQualifierPart : FirTypeProjectionContainer {
     val name: Name
 }
 
-interface FirUserTypeRef : FirTypeRefWithNullability {
-    val qualifier: List<FirQualifierPart>
+abstract class FirUserTypeRef(
+    session: FirSession,
+    psi: PsiElement?,
+    isMarkedNullable: Boolean
+) : FirTypeRefWithNullability(session, psi, isMarkedNullable) {
+    abstract val qualifier: List<FirQualifierPart>
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitUserTypeRef(this, data)

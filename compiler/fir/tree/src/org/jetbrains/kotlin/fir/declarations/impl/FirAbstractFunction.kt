@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.declarations.impl
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.expressions.FirBlock
@@ -18,7 +19,7 @@ import org.jetbrains.kotlin.fir.visitors.FirTransformer
 abstract class FirAbstractFunction(
     session: FirSession,
     psi: PsiElement?
-) : FirAbstractAnnotatedDeclaration(session, psi), FirFunction {
+) : FirDeclaration(session, psi), FirFunction {
     final override val valueParameters = mutableListOf<FirValueParameter>()
 
     final override var body: FirBlock? = null
@@ -27,6 +28,6 @@ abstract class FirAbstractFunction(
         valueParameters.transformInplace(transformer, data)
         body = body?.transformSingle(transformer, data)
 
-        return super<FirAbstractAnnotatedDeclaration>.transformChildren(transformer, data)
+        return super<FirDeclaration>.transformChildren(transformer, data)
     }
 }

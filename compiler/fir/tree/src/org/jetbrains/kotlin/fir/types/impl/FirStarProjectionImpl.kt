@@ -10,6 +10,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.types.FirStarProjection
 
 class FirStarProjectionImpl(
-    override val session: FirSession,
-    override val psi: PsiElement?
-) : FirStarProjection
+    session: FirSession,
+    psi: PsiElement?
+) : FirStarProjection(session, psi)

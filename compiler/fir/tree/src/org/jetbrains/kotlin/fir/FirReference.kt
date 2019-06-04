@@ -5,9 +5,13 @@
 
 package org.jetbrains.kotlin.fir
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirReference : FirElement {
+abstract class FirReference(
+    session: FirSession,
+    psi: PsiElement?
+) : FirElement(session, psi) {
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitReference(this, data)
 }

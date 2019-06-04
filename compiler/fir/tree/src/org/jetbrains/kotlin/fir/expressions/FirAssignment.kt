@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.fir.expressions
 
 import org.jetbrains.kotlin.fir.FirReference
 import org.jetbrains.kotlin.fir.visitors.FirTransformer
-import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
 interface FirAssignment : FirQualifiedAccess {
     val lValue: FirReference get() = calleeReference
@@ -17,12 +16,4 @@ interface FirAssignment : FirQualifiedAccess {
     val operation: FirOperation
 
     fun <D> transformRValue(transformer: FirTransformer<D>, data: D): FirAssignment
-
-    override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
-        visitor.visitAssignment(this, data)
-
-    override fun <R, D> acceptChildren(visitor: FirVisitor<R, D>, data: D) {
-        rValue.accept(visitor, data)
-        super.acceptChildren(visitor, data)
-    }
 }

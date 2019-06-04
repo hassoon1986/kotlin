@@ -5,14 +5,19 @@
 
 package org.jetbrains.kotlin.fir.expressions
 
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 
-interface FirCatch : FirElement {
-    val parameter: FirValueParameter
+abstract class FirCatch(
+    session: FirSession,
+    psi: PsiElement?
+) : FirElement(session, psi) {
+    abstract val parameter: FirValueParameter
 
-    val block: FirBlock
+    abstract val block: FirBlock
 
     override fun <R, D> accept(visitor: FirVisitor<R, D>, data: D): R =
         visitor.visitCatch(this, data)

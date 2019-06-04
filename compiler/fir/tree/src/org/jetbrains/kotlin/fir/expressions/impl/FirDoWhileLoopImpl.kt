@@ -14,4 +14,4 @@ class FirDoWhileLoopImpl(
     session: FirSession,
     psi: PsiElement?,
     condition: FirExpression
-) : FirAbstractLoop(session, psi, condition), FirDoWhileLoop
+) : FirDoWhileLoop(session, psi, condition)

@@ -3,13 +3,15 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.fir
+package org.jetbrains.kotlin.fir.declarations
 
-import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 
-abstract class FirAbstractElement(
-    final override val session: FirSession,
-    final override val psi: PsiElement?
-) : FirElement
+interface FirValVarOwner : FirTypedDeclaration {
+    val isVar: Boolean
+
+    val isVal: Boolean
+        get() = !isVar
+
+    val initializer: FirExpression?
+}
