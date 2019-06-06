@@ -164,6 +164,7 @@ import org.jetbrains.kotlin.search.AbstractAnnotatedMembersSearchTest
 import org.jetbrains.kotlin.search.AbstractInheritorsSearchTest
 import org.jetbrains.kotlin.shortenRefs.AbstractShortenRefsTest
 import org.jetbrains.kotlin.test.TargetBackend
+import org.jetbrains.kotlinx.serialization.AbstractSerializationPluginBytecodeListingTest
 import org.jetbrains.kotlinx.serialization.AbstractSerializationPluginDiagnosticTest
 
 fun main(args: Array<String>) {
@@ -1153,6 +1154,10 @@ fun main(args: Array<String>) {
     ) {
         testClass<AbstractSerializationPluginDiagnosticTest> {
             model("diagnostics")
+        }
+
+        testClass<AbstractSerializationPluginBytecodeListingTest> {
+            model("codegen")
         }
     }
 /*

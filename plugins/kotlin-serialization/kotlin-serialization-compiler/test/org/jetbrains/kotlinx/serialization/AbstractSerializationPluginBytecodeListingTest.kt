@@ -6,13 +6,12 @@
 package org.jetbrains.kotlinx.serialization
 
 import junit.framework.TestCase
-import org.jetbrains.kotlin.checkers.AbstractDiagnosticsTest
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.JvmClasspathRoot
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationPluginComponentContainerContributor
-import java.io.File
+import org.jetbrains.kotlin.codegen.AbstractAsmLikeInstructionListingTest
+import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationComponentRegistrar
 
-abstract class AbstractSerializationPluginDiagnosticTest : AbstractDiagnosticsTest() {
+abstract class AbstractSerializationPluginBytecodeListingTest : AbstractAsmLikeInstructionListingTest() {
     private val runtimeLibraryPath = getSerializationLibraryRuntimeJar()
 
     fun testRuntimeLibraryExists() {
@@ -22,8 +21,8 @@ abstract class AbstractSerializationPluginDiagnosticTest : AbstractDiagnosticsTe
         )
     }
 
-    override fun createEnvironment(file: File) = super.createEnvironment(file).apply {
-        StorageComponentContainerContributor.registerExtension(project, SerializationPluginComponentContainerContributor())
-        updateClasspath(listOf(JvmClasspathRoot(runtimeLibraryPath!!)))
+    override fun setupEnvironment(environment: KotlinCoreEnvironment) {
+        SerializationComponentRegistrar.registerExtensions(environment.project)
+        environment.updateClasspath(listOf(JvmClasspathRoot(runtimeLibraryPath!!)))
     }
 }
