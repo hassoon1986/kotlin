@@ -26,11 +26,14 @@ class KotlinModuleOutOfCodeBlockModificationTracker private constructor(private 
     private val kotlinOutOfCodeBlockTracker = KotlinCodeBlockModificationListener.getInstance(module.project).kotlinOutOfCodeBlockTracker
 
     private val dependencies by lazy {
+        // Avoid implicit capturing for this to make CachedValueStabilityChecker happy
+        val module = module
+
         module.cached(CachedValueProvider {
             CachedValueProvider.Result.create(
-                HashSet<Module>().apply {
+                HashSet<Module>().also { resultModuleSet ->
                     ModuleRootManager.getInstance(module).orderEntries().recursively().forEachModule(
-                        CommonProcessors.CollectProcessor(this)
+                        CommonProcessors.CollectProcessor(resultModuleSet)
                     )
                 },
                 ProjectRootModificationTracker.getInstance(module.project)
