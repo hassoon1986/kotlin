@@ -88,14 +88,20 @@ class KotlinCodeBlockModificationListener(
             }
         })
 
+        @Suppress("UnstableApiUsage")
         messageBusConnection.subscribe(PsiModificationTracker.TOPIC, PsiModificationTracker.Listener {
-            @Suppress("UnstableApiUsage") val kotlinTrackerInternalIDECount =
-                modificationTrackerImpl.forLanguage(KotlinLanguage.INSTANCE).modificationCount
-            if (kotlinModificationTracker == kotlinTrackerInternalIDECount) {
-                // Some update that we are not sure is from Kotlin language, as Kotlin language tracker wasn't changed
-                kotlinOutOfCodeBlockTrackerImpl.incModificationCount()
+            if (modificationTrackerImpl.isEnableLanguageTracker) {
+                val kotlinTrackerInternalIDECount =
+                    modificationTrackerImpl.forLanguage(KotlinLanguage.INSTANCE).modificationCount
+                if (kotlinModificationTracker == kotlinTrackerInternalIDECount) {
+                    // Some update that we are not sure is from Kotlin language, as Kotlin language tracker wasn't changed
+                    kotlinOutOfCodeBlockTrackerImpl.incModificationCount()
+                } else {
+                    kotlinModificationTracker = kotlinTrackerInternalIDECount
+                }
             } else {
-                kotlinModificationTracker = kotlinTrackerInternalIDECount
+                // Can't distinguish kotlin from non-kotlin modifications
+                kotlinOutOfCodeBlockTrackerImpl.incModificationCount()
             }
 
             perModuleOutOfCodeBlockTrackerUpdater.onPsiModificationTrackerUpdate()
