@@ -1,0 +1,32 @@
+package
+
+@kotlinx.serialization.Serializable public final class Basic {
+    public constructor Basic(/*0*/ foo: NonSerializable)
+    public final val foo: NonSerializable
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+@kotlinx.serialization.Serializable public final class Inside {
+    public constructor Inside(/*0*/ foo: kotlin.collections.List<NonSerializable>)
+    public final val foo: kotlin.collections.List<NonSerializable>
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class NonSerializable {
+    public constructor NonSerializable()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+@kotlinx.serialization.Serializable public final class WithImplicitType {
+    public constructor WithImplicitType()
+    public final val foo: NonSerializable
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

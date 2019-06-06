@@ -154,6 +154,7 @@ import org.jetbrains.kotlin.search.AbstractAnnotatedMembersSearchTest
 import org.jetbrains.kotlin.search.AbstractInheritorsSearchTest
 import org.jetbrains.kotlin.shortenRefs.AbstractShortenRefsTest
 import org.jetbrains.kotlin.test.TargetBackend
+import org.jetbrains.kotlinx.serialization.AbstractSerializationPluginDiagnosticTest
 
 fun main(args: Array<String>) {
     System.setProperty("java.awt.headless", "true")
@@ -1037,6 +1038,15 @@ fun main(args: Array<String>) {
         }
         testClass<AbstractSamWithReceiverScriptTest> {
             model("script", extension = "kts")
+        }
+    }
+
+    testGroup(
+        "plugins/kotlin-serialization/kotlin-serialization-compiler/test",
+        "plugins/kotlin-serialization/kotlin-serialization-compiler/testData"
+    ) {
+        testClass<AbstractSerializationPluginDiagnosticTest> {
+            model("diagnostics")
         }
     }
 /*

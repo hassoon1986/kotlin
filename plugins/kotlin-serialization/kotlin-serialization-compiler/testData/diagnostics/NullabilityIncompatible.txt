@@ -1,0 +1,27 @@
+package
+
+@kotlinx.serialization.Serializable public final class Foo {
+    public constructor Foo(/*0*/ foo: Nope)
+    public final val foo: Nope
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+@kotlinx.serialization.Serializable(with = NopeNullableSerializer::class) public final class Nope {
+    public constructor Nope()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+public final class NopeNullableSerializer : kotlinx.serialization.KSerializer<Nope?> {
+    public constructor NopeNullableSerializer()
+    public open override /*1*/ val descriptor: kotlinx.serialization.SerialDescriptor
+    public open override /*1*/ fun deserialize(/*0*/ decoder: kotlinx.serialization.Decoder): Nope?
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun patch(/*0*/ decoder: kotlinx.serialization.Decoder, /*1*/ old: Nope?): Nope?
+    public open override /*1*/ fun serialize(/*0*/ encoder: kotlinx.serialization.Encoder, /*1*/ obj: Nope?): kotlin.Nothing
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
