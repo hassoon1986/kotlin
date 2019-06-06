@@ -5,11 +5,15 @@
 
 package org.jetbrains.kotlin.idea.caches.trackers
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.util.PsiModificationTracker
 import org.jetbrains.kotlin.analyzer.KotlinModificationTrackerService
 
-class KotlinIDEModificationTrackerService(psiModificationTracker: PsiModificationTracker) : KotlinModificationTrackerService() {
+class KotlinIDEModificationTrackerService(project: Project, psiModificationTracker: PsiModificationTracker) :
+    KotlinModificationTrackerService() {
+
     override val modificationTracker: ModificationTracker = psiModificationTracker
-    override val outOfBlockModificationTracker: ModificationTracker = psiModificationTracker.outOfCodeBlockModificationTracker
+    override val outOfBlockModificationTracker: ModificationTracker =
+        KotlinCodeBlockModificationListener.getInstance(project).kotlinOutOfCodeBlockTracker
 }
