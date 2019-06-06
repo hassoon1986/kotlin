@@ -44,12 +44,28 @@ class KotlinCodeBlockModificationListener(
 ): PsiTreeChangePreprocessor {
     private val modificationTrackerImpl = modificationTracker as PsiModificationTrackerImpl
 
+    @Suppress("UnstableApiUsage")
+    private val isLanguageTrackerEnabled = modificationTrackerImpl.isEnableLanguageTracker
+
     @Volatile
     private var kotlinModificationTracker: Long = -1
 
-    private val kotlinOutOfCodeBlockTrackerImpl = object : SimpleModificationTracker() {
-        override fun incModificationCount() {
-            super.incModificationCount()
+    private val kotlinOutOfCodeBlockTrackerImpl: SimpleModificationTracker = if (isLanguageTrackerEnabled) {
+        object : SimpleModificationTracker() {
+            override fun incModificationCount() {
+                super.incModificationCount()
+            }
+        }
+    } else {
+        object : SimpleModificationTracker() {
+            override fun incModificationCount() {
+                super.incModificationCount()
+            }
+
+            override fun getModificationCount(): Long {
+                @Suppress("DEPRECATION")
+                return super.getModificationCount() + modificationTracker.outOfCodeBlockModificationCount
+            }
         }
     }
 
@@ -61,7 +77,9 @@ class KotlinCodeBlockModificationListener(
         val model = PomManager.getModel(project)
         val messageBusConnection = project.messageBus.connect()
 
-        (PsiManager.getInstance(project) as PsiManagerImpl).addTreeChangePreprocessor(this)
+        if (isLanguageTrackerEnabled) {
+            (PsiManager.getInstance(project) as PsiManagerImpl).addTreeChangePreprocessor(this)
+        }
 
         model.addModelListener(object : PomModelListener {
             override fun isAspectChangeInteresting(aspect: PomModelAspect): Boolean {
@@ -90,7 +108,7 @@ class KotlinCodeBlockModificationListener(
 
         @Suppress("UnstableApiUsage")
         messageBusConnection.subscribe(PsiModificationTracker.TOPIC, PsiModificationTracker.Listener {
-            if (modificationTrackerImpl.isEnableLanguageTracker) {
+            if (isLanguageTrackerEnabled) {
                 val kotlinTrackerInternalIDECount =
                     modificationTrackerImpl.forLanguage(KotlinLanguage.INSTANCE).modificationCount
                 if (kotlinModificationTracker == kotlinTrackerInternalIDECount) {
@@ -99,9 +117,6 @@ class KotlinCodeBlockModificationListener(
                 } else {
                     kotlinModificationTracker = kotlinTrackerInternalIDECount
                 }
-            } else {
-                // Can't distinguish kotlin from non-kotlin modifications
-                kotlinOutOfCodeBlockTrackerImpl.incModificationCount()
             }
 
             perModuleOutOfCodeBlockTrackerUpdater.onPsiModificationTrackerUpdate()
@@ -109,6 +124,8 @@ class KotlinCodeBlockModificationListener(
     }
 
     override fun treeChanged(event: PsiTreeChangeEventImpl) {
+        assert(isLanguageTrackerEnabled)
+
         if (!PsiModificationTrackerImpl.canAffectPsi(event)) {
             return
         }
