@@ -133,15 +133,27 @@ open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
             tracker.sdkResolversComputed.clear()
             tracker.moduleResolversComputed.clear()
 
-            KotlinModuleOutOfCodeBlockModificationTracker.initialize(project)
-            val module1ModCount = KotlinModuleOutOfCodeBlockModificationTracker.getModificationCount(module1)
-
             val module1ModTracker = KotlinModuleOutOfCodeBlockModificationTracker(module1)
             val module2ModTracker = KotlinModuleOutOfCodeBlockModificationTracker(module2)
             val module3ModTracker = KotlinModuleOutOfCodeBlockModificationTracker(module3)
 
-            val contentRoot = ModuleRootManager.getInstance(module2).contentRoots.single()
-            val m2 = contentRoot.findChild("m2.kt")!!
+            val m2ContentRoot = ModuleRootManager.getInstance(module1).contentRoots.single()
+            val m1 = m2ContentRoot.findChild("m1.kt")!!
+            val m1doc = FileDocumentManager.getInstance().getDocument(m1)!!
+            project.executeWriteCommand("a") {
+                m1doc.insertString(m1doc.textLength , "fun foo() = 1")
+                PsiDocumentManager.getInstance(myProject).commitAllDocuments()
+            }
+
+            // Internal counters should be ready after modifications in m1
+            val afterFirstModification = KotlinModuleOutOfCodeBlockModificationTracker.getModificationCount(module1)
+
+            assertEquals(afterFirstModification, module1ModTracker.modificationCount)
+            assertEquals(afterFirstModification, module2ModTracker.modificationCount)
+            assertEquals(afterFirstModification, module3ModTracker.modificationCount)
+
+            val m1ContentRoot = ModuleRootManager.getInstance(module2).contentRoots.single()
+            val m2 = m1ContentRoot.findChild("m2.kt")!!
             val m2doc = FileDocumentManager.getInstance().getDocument(m2)!!
             project.executeWriteCommand("a") {
                 m2doc.insertString(m2doc.textLength , "fun foo() = 1")
@@ -150,15 +162,17 @@ open class MultiModuleHighlightingTest : AbstractMultiModuleHighlightingTest() {
 
             val currentModCount = KotlinCodeBlockModificationListener.getInstance(project).kotlinOutOfCodeBlockTracker.modificationCount
 
-            assertEquals(module1ModCount, KotlinModuleOutOfCodeBlockModificationTracker.getModificationCount(module1))
-            assertEquals(module1ModCount, module1ModTracker.modificationCount)
+            // Counter for m1 module should be unaffected by modification in m2
+            assertEquals(afterFirstModification, KotlinModuleOutOfCodeBlockModificationTracker.getModificationCount(module1))
+            assertEquals(afterFirstModification, module1ModTracker.modificationCount)
+
             assertEquals(currentModCount, module2ModTracker.modificationCount)
             assertEquals(currentModCount, module3ModTracker.modificationCount)
 
             checkHighlightingInProject { project.allKotlinFiles().filter { "m2" in it.name } }
 
             assertEquals(0, tracker.sdkResolversComputed.size)
-            assertEquals(1, tracker.moduleResolversComputed.size)
+            assertEquals(2, tracker.moduleResolversComputed.size)
 
             tracker.moduleResolversComputed.clear()
             (PsiModificationTracker.SERVICE.getInstance(myProject) as PsiModificationTrackerImpl).incOutOfCodeBlockModificationCounter()
