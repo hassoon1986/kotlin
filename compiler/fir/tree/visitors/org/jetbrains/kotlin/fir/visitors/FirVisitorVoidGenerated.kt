@@ -204,6 +204,22 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
         visitAbstractExpression(whenSubjectExpression, null)
     }
 
+    open fun visitWrappedArgumentExpression(wrappedArgumentExpression: FirWrappedArgumentExpression) {
+        visitAbstractExpression(wrappedArgumentExpression, null)
+    }
+
+    open fun visitLambdaArgumentExpression(lambdaArgumentExpression: FirLambdaArgumentExpression) {
+        visitWrappedArgumentExpression(lambdaArgumentExpression, null)
+    }
+
+    open fun visitNamedArgumentExpression(namedArgumentExpression: FirNamedArgumentExpression) {
+        visitWrappedArgumentExpression(namedArgumentExpression, null)
+    }
+
+    open fun visitSpreadArgumentExpression(spreadArgumentExpression: FirSpreadArgumentExpression) {
+        visitWrappedArgumentExpression(spreadArgumentExpression, null)
+    }
+
     open fun visitAnonymousFunction(anonymousFunction: FirAnonymousFunction) {
         visitExpression(anonymousFunction, null)
     }
@@ -294,22 +310,6 @@ abstract class FirVisitorVoid : FirVisitor<Unit, Nothing?>() {
 
     open fun visitThrowExpression(throwExpression: FirThrowExpression) {
         visitExpression(throwExpression, null)
-    }
-
-    open fun visitWrappedArgumentExpression(wrappedArgumentExpression: FirWrappedArgumentExpression) {
-        visitExpression(wrappedArgumentExpression, null)
-    }
-
-    open fun visitLambdaArgumentExpression(lambdaArgumentExpression: FirLambdaArgumentExpression) {
-        visitWrappedArgumentExpression(lambdaArgumentExpression, null)
-    }
-
-    open fun visitNamedArgumentExpression(namedArgumentExpression: FirNamedArgumentExpression) {
-        visitWrappedArgumentExpression(namedArgumentExpression, null)
-    }
-
-    open fun visitSpreadArgumentExpression(spreadArgumentExpression: FirSpreadArgumentExpression) {
-        visitWrappedArgumentExpression(spreadArgumentExpression, null)
     }
 
     open fun visitLoop(loop: FirLoop) {

@@ -204,6 +204,22 @@ abstract class FirTransformer<in D> : FirVisitor<CompositeTransformResult<FirEle
         return transformAbstractExpression(whenSubjectExpression, data)
     }
 
+    open fun transformWrappedArgumentExpression(wrappedArgumentExpression: FirWrappedArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
+        return transformAbstractExpression(wrappedArgumentExpression, data)
+    }
+
+    open fun transformLambdaArgumentExpression(lambdaArgumentExpression: FirLambdaArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
+        return transformWrappedArgumentExpression(lambdaArgumentExpression, data)
+    }
+
+    open fun transformNamedArgumentExpression(namedArgumentExpression: FirNamedArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
+        return transformWrappedArgumentExpression(namedArgumentExpression, data)
+    }
+
+    open fun transformSpreadArgumentExpression(spreadArgumentExpression: FirSpreadArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
+        return transformWrappedArgumentExpression(spreadArgumentExpression, data)
+    }
+
     open fun transformAnonymousFunction(anonymousFunction: FirAnonymousFunction, data: D): CompositeTransformResult<FirExpression> {
         return transformExpression(anonymousFunction, data)
     }
@@ -294,22 +310,6 @@ abstract class FirTransformer<in D> : FirVisitor<CompositeTransformResult<FirEle
 
     open fun transformThrowExpression(throwExpression: FirThrowExpression, data: D): CompositeTransformResult<FirExpression> {
         return transformExpression(throwExpression, data)
-    }
-
-    open fun transformWrappedArgumentExpression(wrappedArgumentExpression: FirWrappedArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
-        return transformExpression(wrappedArgumentExpression, data)
-    }
-
-    open fun transformLambdaArgumentExpression(lambdaArgumentExpression: FirLambdaArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
-        return transformWrappedArgumentExpression(lambdaArgumentExpression, data)
-    }
-
-    open fun transformNamedArgumentExpression(namedArgumentExpression: FirNamedArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
-        return transformWrappedArgumentExpression(namedArgumentExpression, data)
-    }
-
-    open fun transformSpreadArgumentExpression(spreadArgumentExpression: FirSpreadArgumentExpression, data: D): CompositeTransformResult<FirExpression> {
-        return transformWrappedArgumentExpression(spreadArgumentExpression, data)
     }
 
     open fun <E : FirStatement> transformLoop(loop: E, data: D): CompositeTransformResult<E> {
