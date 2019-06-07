@@ -939,6 +939,14 @@ open class FirBodyResolveTransformer(val session: FirSession, val implicitTypeOn
         }
     }
 
+    override fun transformWrappedArgumentExpression(
+        wrappedArgumentExpression: FirWrappedArgumentExpression,
+        data: Any?
+    ): CompositeTransformResult<FirExpression> {
+        wrappedArgumentExpression.transformChildren(this, data)
+        return wrappedArgumentExpression.compose()
+    }
+
     override fun transformExpression(expression: FirExpression, data: Any?): CompositeTransformResult<FirExpression> {
         if (expression.resultType is FirImplicitTypeRef) {
             val type = FirErrorTypeRefImpl(session, expression.psi, "Type calculating for ${expression::class} is not supported")
