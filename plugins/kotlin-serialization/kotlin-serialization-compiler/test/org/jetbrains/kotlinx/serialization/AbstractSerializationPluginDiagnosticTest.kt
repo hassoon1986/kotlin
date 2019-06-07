@@ -15,13 +15,6 @@ import java.io.File
 abstract class AbstractSerializationPluginDiagnosticTest : AbstractDiagnosticsTest() {
     private val runtimeLibraryPath = getSerializationLibraryRuntimeJar()
 
-    fun testRuntimeLibraryExists() {
-        TestCase.assertNotNull(
-            "kotlinx-serialization runtime library is not found. Make sure it is present in test classpath",
-            runtimeLibraryPath
-        )
-    }
-
     override fun createEnvironment(file: File) = super.createEnvironment(file).apply {
         StorageComponentContainerContributor.registerExtension(project, SerializationPluginComponentContainerContributor())
         updateClasspath(listOf(JvmClasspathRoot(runtimeLibraryPath!!)))

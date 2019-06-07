@@ -5,8 +5,22 @@
 
 package org.jetbrains.kotlinx.serialization
 
+import junit.framework.TestCase
 import org.jetbrains.kotlin.utils.PathUtil
+import org.junit.Test
 import java.io.File
+
+class RuntimeLibraryInClasspathTest {
+    private val runtimeLibraryPath = getSerializationLibraryRuntimeJar()
+
+    @Test
+    fun testRuntimeLibraryExists() {
+        TestCase.assertNotNull(
+            "kotlinx-serialization runtime library is not found. Make sure it is present in test classpath",
+            runtimeLibraryPath
+        )
+    }
+}
 
 internal fun getSerializationLibraryRuntimeJar(): File? = try {
     PathUtil.getResourcePathForClass(Class.forName("kotlinx.serialization.KSerializer"))

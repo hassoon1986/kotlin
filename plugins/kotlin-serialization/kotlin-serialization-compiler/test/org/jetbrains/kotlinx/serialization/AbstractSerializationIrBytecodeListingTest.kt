@@ -17,13 +17,6 @@ import java.io.File
 abstract class AbstractSerializationIrBytecodeListingTest : AbstractAsmLikeInstructionListingTest() {
     private val runtimeLibraryPath = getSerializationLibraryRuntimeJar()
 
-    fun testRuntimeLibraryExists() {
-        TestCase.assertNotNull(
-            "kotlinx-serialization runtime library is not found. Make sure it is present in test classpath",
-            runtimeLibraryPath
-        )
-    }
-
     override fun getExpectedTextFileName(wholeFile: File): String {
         return wholeFile.nameWithoutExtension + ".ir.txt"
     }

@@ -14,13 +14,6 @@ import org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationComp
 abstract class AbstractSerializationPluginBytecodeListingTest : AbstractAsmLikeInstructionListingTest() {
     private val runtimeLibraryPath = getSerializationLibraryRuntimeJar()
 
-    fun testRuntimeLibraryExists() {
-        TestCase.assertNotNull(
-            "kotlinx-serialization runtime library is not found. Make sure it is present in test classpath",
-            runtimeLibraryPath
-        )
-    }
-
     override fun setupEnvironment(environment: KotlinCoreEnvironment) {
         SerializationComponentRegistrar.registerExtensions(environment.project)
         environment.updateClasspath(listOf(JvmClasspathRoot(runtimeLibraryPath!!)))
