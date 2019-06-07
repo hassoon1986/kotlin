@@ -499,7 +499,7 @@ class Fir2IrDeclarationStorage(
         }
     }
 
-    fun getIrPropertyOrFieldSymbol(firPropertySymbol: FirPropertySymbol): IrSymbol {
+    fun getIrPropertyOrFieldSymbol(firPropertySymbol: FirCallableSymbol<*>): IrSymbol {
         return when (val fir = firPropertySymbol.fir) {
             is FirProperty -> {
                 val irProperty = getIrProperty(fir).apply {
@@ -531,10 +531,9 @@ class Fir2IrDeclarationStorage(
                     ?: return getIrVariableSymbol(firDeclaration)
                 irSymbolTable.referenceValueParameter(irDeclaration.descriptor)
             }
-            is FirVariable -> {
+            else -> {
                 getIrVariableSymbol(firDeclaration)
             }
-            else -> throw AssertionError("Should not be here")
         }
     }
 }
