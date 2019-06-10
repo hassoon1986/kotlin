@@ -733,12 +733,20 @@ fun jdkPath(version: String): String {
     return configuredJdks.find { it.majorVersion == jdkMajorVersion }?.homeDir?.canonicalPath ?: jdkNotFoundConst
 }
 
+val currentJavaHome = File(System.getProperty("java.home"))
 
 fun Project.configureJvmProject(javaHome: String, javaVersion: String) {
+    val targetJavaHome = File(javaHome).canonicalFile
+
     tasks.withType<JavaCompile> {
         if (name != "compileJava9Java") {
-            options.isFork = true
-            options.forkOptions.javaHome = file(javaHome)
+            if (targetJavaHome != currentJavaHome) {
+                options.isFork = true
+                options.forkOptions.javaHome = file(javaHome)
+            } else {
+                options.isFork = false
+                options.forkOptions.javaHome = null
+            }
             options.compilerArgs.add("-proc:none")
             options.encoding = "UTF-8"
         }
